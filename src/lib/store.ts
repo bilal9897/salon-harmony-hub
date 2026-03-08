@@ -191,6 +191,34 @@ export function useServiceTypes() {
   return { services, addService, removeService, updateService };
 }
 
+export function useServicePrices() {
+  const [prices, setPricesState] = useState<Record<string, number>>(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.servicePrices);
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  });
+
+  const setPrice = useCallback((service: string, price: number) => {
+    setPricesState(prev => {
+      const next = { ...prev, [service]: price };
+      localStorage.setItem(STORAGE_KEYS.servicePrices, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  const removePrice = useCallback((service: string) => {
+    setPricesState(prev => {
+      const next = { ...prev };
+      delete next[service];
+      localStorage.setItem(STORAGE_KEYS.servicePrices, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  return { prices, setPrice, removePrice };
+}
+
 // Analytics helpers
 export function getToday(): string {
   return new Date().toISOString().split('T')[0];
