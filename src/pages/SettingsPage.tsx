@@ -130,14 +130,74 @@ function EditableList({
   );
 }
 
+function InstallPWA() {
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstalled, setIsInstalled] = useState(false);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+
+    // Check if already installed
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      setIsInstalled(true);
+    }
+
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) {
+      toast.info("Open this app in Chrome/Edge browser, then try again");
+      return;
+    }
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      toast.success("App installed successfully!");
+      setIsInstalled(true);
+    }
+    setDeferredPrompt(null);
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="card-elevated">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+          <Smartphone className="h-4.5 w-4.5 text-primary" />
+        </div>
+        <div>
+          <h3 className="section-title">Install App</h3>
+          <p className="text-xs text-muted-foreground">Add to your home screen for quick access</p>
+        </div>
+      </div>
+      {isInstalled ? (
+        <p className="text-sm text-muted-foreground flex items-center gap-2">
+          <Check className="h-4 w-4 text-green-500" /> App is already installed
+        </p>
+      ) : (
+        <Button onClick={handleInstall} className="w-full rounded-xl gap-2">
+          <Download className="h-4 w-4" />
+          Install Fresh Saloon
+        </Button>
+      )}
+    </motion.div>
+  );
+}
+
 export default function SettingsPage() {
   const { staff, addStaff, removeStaff, updateStaff } = useStaffMembers();
 
   return (
     <div>
-      <PageHeader title="Settings" description="Manage your salon's staff members" icon={SettingsIcon} />
+      <PageHeader title="Settings" description="Personal salon management" icon={SettingsIcon} />
 
-      <div className="max-w-lg">
+      <div className="max-w-lg space-y-6">
+        <InstallPWA />
+
         <EditableList
           title="Staff Members"
           icon={Users}
