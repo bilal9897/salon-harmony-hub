@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Plus, CreditCard, IndianRupee } from "lucide-react";
+import { Trash2, Plus, CreditCard, IndianRupee, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -62,6 +62,16 @@ export default function Payments() {
     toast.success("✅ Payment recorded!");
     setAmount("");
     setServiceType("");
+  };
+
+  const lastTx = transactions[0];
+  const handleRepeat = () => {
+    if (!lastTx) return;
+    setServiceType(lastTx.serviceType);
+    setStaffMember(lastTx.staffMember);
+    setAmount(String(lastTx.amount));
+    setPaymentMethod(lastTx.paymentMethod);
+    toast.info("Last payment loaded — tap Add to confirm");
   };
 
   return (
@@ -134,9 +144,16 @@ export default function Payments() {
             </div>
           </div>
 
-          <Button type="submit" className="gap-2 rounded-xl h-12 text-base">
-            <Plus className="h-4 w-4" /> Add Payment
-          </Button>
+          <div className="flex gap-2">
+            {lastTx && (
+              <Button type="button" variant="outline" onClick={handleRepeat} className="gap-2 rounded-xl h-12 text-base">
+                <RotateCcw className="h-4 w-4" /> Repeat Last
+              </Button>
+            )}
+            <Button type="submit" className="gap-2 rounded-xl h-12 text-base flex-1">
+              <Plus className="h-4 w-4" /> Add Payment
+            </Button>
+          </div>
         </div>
       </motion.form>
 
