@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useStaffMembers, useReportContacts, useAmountPresets } from "@/lib/store";
+import { useStaffMembers, useReportContacts, useAmountPresets, getSalonName } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -177,12 +177,12 @@ function InstallPWA() {
       </div>
       {isInstalled ? (
         <p className="text-sm text-muted-foreground flex items-center gap-2">
-          <Check className="h-4 w-4 text-green-500" /> App is already installed
+          <Check className="h-4 w-4 text-primary" /> App is already installed
         </p>
       ) : (
         <Button onClick={handleInstall} className="w-full rounded-xl gap-2">
           <Download className="h-4 w-4" />
-          Install Fresh Saloon
+          Install {getSalonName()}
         </Button>
       )}
     </motion.div>
@@ -250,10 +250,10 @@ function BackupRestore() {
         </div>
         <div>
           <h3 className="section-title">Backup & Restore</h3>
-          <p className="text-xs text-muted-foreground">Export or import your salon data as a JSON file</p>
+          <p className="text-xs text-muted-foreground">Export or import salon data as JSON</p>
         </div>
       </div>
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <Button onClick={handleExport} className="flex-1 rounded-xl gap-2">
           <Download className="h-4 w-4" /> Export Backup
         </Button>
@@ -394,9 +394,9 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <PageHeader title="Settings" description="Personal salon management" icon={SettingsIcon} />
+      <PageHeader title="Settings" description="Salon management" icon={SettingsIcon} />
 
-      <div className="max-w-lg space-y-6">
+      <div className="max-w-lg space-y-4 sm:space-y-6">
         <InstallPWA />
         <BackupRestore />
         <ReportSharing />
