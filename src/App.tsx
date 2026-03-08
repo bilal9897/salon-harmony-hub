@@ -24,8 +24,8 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route element={<DashboardLayout />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/payments" element={<Payments />} />
+            <Route path="/" element={<Payments />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/staff" element={<Staff />} />
             <Route path="/expenses" element={<Expenses />} />
             <Route path="/daily-cash" element={<DailyCash />} />
