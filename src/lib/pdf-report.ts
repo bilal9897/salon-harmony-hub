@@ -24,7 +24,7 @@ function drawBrandedHeader(doc: jsPDF, title: string, subtitle: string) {
   doc.setTextColor(...WHITE);
   doc.setFontSize(24);
   doc.setFont("helvetica", "bold");
-  doc.text("GlamBook", pw / 2, 16, { align: "center" });
+  doc.text("Fresh Saloon", pw / 2, 16, { align: "center" });
   // Title
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
@@ -48,7 +48,7 @@ function drawFooter(doc: jsPDF) {
     doc.setFontSize(7);
     doc.setTextColor(...GRAY);
     doc.setFont("helvetica", "normal");
-    doc.text("GlamBook Salon Management", 14, ph - 9);
+    doc.text("Fresh Saloon", 14, ph - 9);
     doc.text(`Page ${i} of ${pages}`, pw - 14, ph - 9, { align: "right" });
   }
 }
@@ -194,7 +194,7 @@ export function generateDailyReport(
   }
 
   drawFooter(doc);
-  doc.save(`GlamBook_Daily_${date}.pdf`);
+  doc.save(`FreshSaloon_Daily_${date}.pdf`);
 }
 
 // ─── MONTHLY REPORT ──────────────────────────────────────────────────────────
@@ -314,7 +314,7 @@ export function generateMonthlyReport(
   }
 
   drawFooter(doc);
-  doc.save(`GlamBook_Report_${month}.pdf`);
+  doc.save(`FreshSaloon_Report_${month}.pdf`);
 }
 
 // ─── ANNUAL REPORT ───────────────────────────────────────────────────────────
@@ -448,5 +448,5 @@ export function generateAnnualReport(
   }
 
   drawFooter(doc);
-  doc.save(`GlamBook_Annual_${year}.pdf`);
+  doc.save(`FreshSaloon_Annual_${year}.pdf`);
 }

@@ -68,7 +68,7 @@ export function AppSidebar() {
               </div>
               {!collapsed && (
                 <span className="font-display text-base font-bold text-sidebar-accent-foreground tracking-tight">
-                  GlamBook
+                  Fresh Saloon
                 </span>
               )}
             </div>

@@ -19,9 +19,9 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "placeholder.svg"],
       manifest: {
-        name: "GlamBook - Salon Manager",
-        short_name: "GlamBook",
-        description: "Smart salon management — payments, staff, expenses & reports",
+        name: "Fresh Saloon",
+        short_name: "Fresh Saloon",
+        description: "Fresh Saloon management — payments, staff, expenses & reports",
         theme_color: "#0d9488",
         background_color: "#f5f5f4",
         display: "standalone",
