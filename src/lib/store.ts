@@ -206,5 +206,5 @@ export function getExpensesByCategory(expenses: Expense[]) {
 }
 
 export const EXPENSE_CATEGORIES = [
-  'Products', 'Utilities', 'Maintenance', 'Rent', 'Supplies', 'Marketing', 'Other'
+  'Chits', 'Food', 'Chai', 'Food & Chai', 'Products', 'Utilities', 'Maintenance', 'Rent', 'Supplies', 'Marketing', 'Other'
 ];
