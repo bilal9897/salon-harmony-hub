@@ -3,7 +3,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { useStaffMembers, useReportContacts } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Upload, Smartphone, HardDrive } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Upload, Smartphone, HardDrive, MessageCircle, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
