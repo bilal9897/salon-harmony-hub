@@ -45,16 +45,27 @@ export default function Expenses() {
         className="form-section"
       >
         <h3 className="section-title mb-5">New Expense</h3>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="space-y-1.5">
+        <div className="space-y-4">
+          <div className="space-y-2">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Category *</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="rounded-xl"><SelectValue placeholder="Select category" /></SelectTrigger>
-              <SelectContent>
-                {EXPENSE_CATEGORIES.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-              </SelectContent>
-            </Select>
+            <div className="flex flex-wrap gap-2">
+              {EXPENSE_CATEGORIES.map(c => (
+                <button
+                  key={c}
+                  type="button"
+                  onClick={() => setCategory(c === category ? "" : c)}
+                  className={`rounded-xl px-4 py-2 text-sm font-medium transition-all duration-150 border ${
+                    category === c
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm scale-[1.02]"
+                      : "bg-card text-foreground border-border hover:border-primary/40 hover:bg-accent/50"
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
           </div>
+        <div className="grid gap-4 sm:grid-cols-3">
           <div className="space-y-1.5">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Amount (₹) *</Label>
             <Input type="number" min="1" placeholder="1000" value={amount} onChange={e => setAmount(e.target.value)} className="rounded-xl" />
