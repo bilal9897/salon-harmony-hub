@@ -194,7 +194,7 @@ export function generateDailyReport(
   }
 
   drawFooter(doc);
-  doc.save(`GlamBook_Daily_${date}.pdf`);
+  doc.save(`FreshSaloon_Daily_${date}.pdf`);
 }
 
 // ─── MONTHLY REPORT ──────────────────────────────────────────────────────────
