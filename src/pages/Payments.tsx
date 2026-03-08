@@ -55,6 +55,37 @@ export default function Payments() {
   const [expDescription, setExpDescription] = useState("");
   const [expDate, setExpDate] = useState(getToday());
 
+  const today = getToday();
+  const dayTx = transactions.filter(t => t.date === today);
+  const dayExp = expenses.filter(e => e.date === today);
+  const totalRevenue = dayTx.reduce((s, t) => s + t.amount, 0);
+  const totalExpenses = dayExp.reduce((s, e) => s + e.amount, 0);
+  const cashRevenue = dayTx.filter(t => t.paymentMethod === "cash").reduce((s, t) => s + t.amount, 0);
+  const onlineRevenue = totalRevenue - cashRevenue;
+
+  const buildReportText = () => {
+    const dateLabel = new Date(today).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    let text = `✂️ *Fresh Saloon — Daily Report*\n📅 ${dateLabel}\n\n`;
+    text += `💰 Revenue: ₹${totalRevenue.toLocaleString("en-IN")}\n`;
+    text += `💵 Cash: ₹${cashRevenue.toLocaleString("en-IN")}\n`;
+    text += `📱 Online: ₹${onlineRevenue.toLocaleString("en-IN")}\n`;
+    text += `🔴 Expenses: ₹${totalExpenses.toLocaleString("en-IN")}\n`;
+    text += `✅ Net Profit: ₹${(totalRevenue - totalExpenses).toLocaleString("en-IN")}\n`;
+    text += `📊 Transactions: ${dayTx.length}\n`;
+    return text;
+  };
+
+  const shareWhatsApp = () => {
+    const text = buildReportText();
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
+  const shareGmail = () => {
+    const text = buildReportText().replace(/\*/g, "");
+    const subject = `Fresh Saloon — Daily Report ${today}`;
+    window.open(`https://mail.google.com/mail/?view=cm&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`, "_blank");
+  };
+
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!staffMember || !payAmount || Number(payAmount) <= 0) {
