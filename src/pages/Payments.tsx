@@ -391,7 +391,7 @@ export default function Payments() {
               <TableBody>
                 {transactions.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-muted-foreground py-16">
+                    <TableCell colSpan={6} className="text-center text-muted-foreground py-16">
                       <div className="space-y-2">
                         <CreditCard className="mx-auto h-8 w-8 text-muted-foreground/40" />
                         <p>No payments yet — add one above!</p>
