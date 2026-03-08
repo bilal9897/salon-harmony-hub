@@ -48,7 +48,7 @@ function drawFooter(doc: jsPDF) {
     doc.setFontSize(7);
     doc.setTextColor(...GRAY);
     doc.setFont("helvetica", "normal");
-    doc.text("GlamBook Salon Management", 14, ph - 9);
+    doc.text("Fresh Saloon", 14, ph - 9);
     doc.text(`Page ${i} of ${pages}`, pw - 14, ph - 9, { align: "right" });
   }
 }
