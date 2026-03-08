@@ -43,6 +43,7 @@ export default function Payments() {
   const { transactions, addTransaction, deleteTransaction } = useTransactions();
   const { staff } = useStaffMembers();
   const { services } = useServiceTypes();
+  const { prices: servicePrices } = useServicePrices();
   const [staffMember, setStaffMember] = useState("");
   const [serviceType, setServiceType] = useState("");
   const [payAmount, setPayAmount] = useState("");
