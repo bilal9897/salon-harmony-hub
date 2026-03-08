@@ -70,7 +70,7 @@ export default function Reports() {
 
   const handleWhatsAppShare = () => {
     const lines = [
-      `📊 *GlamBook Daily Report*`,
+      `📊 *Fresh Saloon Daily Report*`,
       `📅 ${periodLabel}`,
       ``,
       `💰 Revenue: ${fmt(totalRevenue)}`,
