@@ -28,6 +28,7 @@ const navItems = [
   { title: "Staff", url: "/staff", icon: Users },
   { title: "Expenses", url: "/expenses", icon: Receipt },
   { title: "Daily Cash", url: "/daily-cash", icon: Wallet },
+  { title: "Reports", url: "/reports", icon: FileBarChart },
   { title: "AI Scanner", url: "/scanner", icon: ScanLine },
 ];
 
