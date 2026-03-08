@@ -1,0 +1,164 @@
+import { useState } from "react";
+import { PageHeader } from "@/components/PageHeader";
+import { useStaffMembers, useServiceTypes } from "@/lib/store";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Scissors } from "lucide-react";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
+
+function EditableList({
+  title,
+  icon: Icon,
+  items,
+  onAdd,
+  onRemove,
+  onUpdate,
+  placeholder,
+}: {
+  title: string;
+  icon: React.ElementType;
+  items: string[];
+  onAdd: (name: string) => void;
+  onRemove: (name: string) => void;
+  onUpdate: (oldName: string, newName: string) => void;
+  placeholder: string;
+}) {
+  const [newItem, setNewItem] = useState("");
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editValue, setEditValue] = useState("");
+
+  const handleAdd = () => {
+    const trimmed = newItem.trim();
+    if (!trimmed) return;
+    if (items.includes(trimmed)) {
+      toast.error("Already exists!");
+      return;
+    }
+    onAdd(trimmed);
+    setNewItem("");
+    toast.success(`Added "${trimmed}"`);
+  };
+
+  const handleSaveEdit = (oldName: string) => {
+    const trimmed = editValue.trim();
+    if (!trimmed || trimmed === oldName) {
+      setEditing(null);
+      return;
+    }
+    if (items.includes(trimmed)) {
+      toast.error("Already exists!");
+      return;
+    }
+    onUpdate(oldName, trimmed);
+    setEditing(null);
+    toast.success("Updated!");
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card-elevated">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+          <Icon className="h-4.5 w-4.5 text-primary" />
+        </div>
+        <div>
+          <h3 className="section-title">{title}</h3>
+          <p className="text-xs text-muted-foreground">{items.length} items</p>
+        </div>
+      </div>
+
+      <div className="flex gap-2 mb-4">
+        <Input
+          placeholder={placeholder}
+          value={newItem}
+          onChange={(e) => setNewItem(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          className="rounded-xl"
+        />
+        <Button onClick={handleAdd} size="icon" className="rounded-xl shrink-0 h-10 w-10">
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="space-y-1">
+        {items.map((item) => (
+          <div
+            key={item}
+            className="group flex items-center gap-2 rounded-xl px-3 py-2.5 transition-colors hover:bg-muted/50"
+          >
+            {editing === item ? (
+              <>
+                <Input
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSaveEdit(item)}
+                  className="h-8 rounded-lg text-sm flex-1"
+                  autoFocus
+                />
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleSaveEdit(item)}>
+                  <Check className="h-3.5 w-3.5 text-success" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditing(null)}>
+                  <X className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <span className="flex-1 text-sm text-foreground">{item}</span>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => { setEditing(item); setEditValue(item); }}
+                >
+                  <Pencil className="h-3 w-3 text-muted-foreground" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => { onRemove(item); toast.info(`Removed "${item}"`); }}
+                >
+                  <Trash2 className="h-3 w-3 text-destructive" />
+                </Button>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
+export default function SettingsPage() {
+  const { staff, addStaff, removeStaff, updateStaff } = useStaffMembers();
+  const { services, addService, removeService, updateService } = useServiceTypes();
+
+  return (
+    <div>
+      <PageHeader title="Settings" description="Manage your salon's staff members and service types" icon={SettingsIcon} />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <EditableList
+          title="Staff Members"
+          icon={Users}
+          items={staff}
+          onAdd={addStaff}
+          onRemove={removeStaff}
+          onUpdate={updateStaff}
+          placeholder="Add new staff member..."
+        />
+
+        <EditableList
+          title="Service Types"
+          icon={Scissors}
+          items={services}
+          onAdd={addService}
+          onRemove={removeService}
+          onUpdate={updateService}
+          placeholder="Add new service type..."
+        />
+      </div>
+    </div>
+  );
+}
