@@ -32,7 +32,7 @@ const STORAGE_KEYS = {
   serviceTypes: 'salon_service_types',
 };
 
-const DEFAULT_STAFF = ['Priya', 'Anita', 'Ravi', 'Meena', 'Sanjay', 'Deepa'];
+const DEFAULT_STAFF = ['Azam', 'Shahnawaz', 'Aalam'];
 const DEFAULT_SERVICES = [
   'Haircut', 'Hair Color', 'Blowout', 'Styling', 'Manicure',
   'Pedicure', 'Facial', 'Waxing', 'Massage', 'Bridal Package', 'Other'
