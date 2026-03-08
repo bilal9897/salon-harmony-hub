@@ -2,7 +2,7 @@ import {
   LayoutDashboard,
   CreditCard,
   Users,
-  Receipt,
+  
   Wallet,
   ScanLine,
   Scissors,
@@ -25,9 +25,8 @@ import {
 
 const mainItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Payments", url: "/payments", icon: CreditCard },
+  { title: "Payments & Expenses", url: "/payments", icon: CreditCard },
   { title: "Staff", url: "/staff", icon: Users },
-  { title: "Expenses", url: "/expenses", icon: Receipt },
   { title: "Daily Cash", url: "/daily-cash", icon: Wallet },
   { title: "Reports", url: "/reports", icon: FileBarChart },
 ];
