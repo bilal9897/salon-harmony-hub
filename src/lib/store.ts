@@ -35,6 +35,7 @@ const STORAGE_KEYS = {
   salonName: 'salon_name',
   paymentPresets: 'salon_payment_presets',
   expensePresets: 'salon_expense_presets',
+  servicePrices: 'salon_service_prices',
 };
 
 const DEFAULT_PAYMENT_PRESETS = [100, 200, 500, 1000, 1500, 2000];
