@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Plus, CreditCard, IndianRupee, RotateCcw, Receipt, FileDown } from "lucide-react";
+import { Trash2, Plus, CreditCard, IndianRupee, RotateCcw, Receipt, FileDown, MessageCircle, Mail } from "lucide-react";
 import { generateDailyReport } from "@/lib/pdf-report";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -54,6 +54,37 @@ export default function Payments() {
   const [expAmount, setExpAmount] = useState("");
   const [expDescription, setExpDescription] = useState("");
   const [expDate, setExpDate] = useState(getToday());
+
+  const today = getToday();
+  const dayTx = transactions.filter(t => t.date === today);
+  const dayExp = expenses.filter(e => e.date === today);
+  const totalRevenue = dayTx.reduce((s, t) => s + t.amount, 0);
+  const totalExpenses = dayExp.reduce((s, e) => s + e.amount, 0);
+  const cashRevenue = dayTx.filter(t => t.paymentMethod === "cash").reduce((s, t) => s + t.amount, 0);
+  const onlineRevenue = totalRevenue - cashRevenue;
+
+  const buildReportText = () => {
+    const dateLabel = new Date(today).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+    let text = `✂️ *Fresh Saloon — Daily Report*\n📅 ${dateLabel}\n\n`;
+    text += `💰 Revenue: ₹${totalRevenue.toLocaleString("en-IN")}\n`;
+    text += `💵 Cash: ₹${cashRevenue.toLocaleString("en-IN")}\n`;
+    text += `📱 Online: ₹${onlineRevenue.toLocaleString("en-IN")}\n`;
+    text += `🔴 Expenses: ₹${totalExpenses.toLocaleString("en-IN")}\n`;
+    text += `✅ Net Profit: ₹${(totalRevenue - totalExpenses).toLocaleString("en-IN")}\n`;
+    text += `📊 Transactions: ${dayTx.length}\n`;
+    return text;
+  };
+
+  const shareWhatsApp = () => {
+    const text = buildReportText();
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+  };
+
+  const shareGmail = () => {
+    const text = buildReportText().replace(/\*/g, "");
+    const subject = `Fresh Saloon — Daily Report ${today}`;
+    window.open(`https://mail.google.com/mail/?view=cm&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`, "_blank");
+  };
 
   const handlePaymentSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,17 +139,35 @@ export default function Payments() {
         description="Record income and expenses in one place"
         icon={CreditCard}
         actions={
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2 rounded-xl"
-            onClick={() => {
-              generateDailyReport(getToday(), transactions, expenses);
-              toast.success("Daily report downloaded!");
-            }}
-          >
-            <FileDown className="h-4 w-4" /> Daily Report
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 rounded-xl"
+              onClick={shareWhatsApp}
+            >
+              <MessageCircle className="h-4 w-4" /> WhatsApp
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 rounded-xl"
+              onClick={shareGmail}
+            >
+              <Mail className="h-4 w-4" /> Gmail
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 rounded-xl"
+              onClick={() => {
+                generateDailyReport(getToday(), transactions, expenses);
+                toast.success("Daily report downloaded!");
+              }}
+            >
+              <FileDown className="h-4 w-4" /> PDF
+            </Button>
+          </div>
         }
       />
 
