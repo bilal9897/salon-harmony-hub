@@ -4,7 +4,7 @@ import { useStaffMembers, useReportContacts, useAmountPresets, useServiceTypes, 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Upload, Smartphone, HardDrive, MessageCircle, Mail, Store, IndianRupee, Moon, Sun } from "lucide-react";
+import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Upload, Smartphone, HardDrive, MessageCircle, Mail, Store, IndianRupee, Moon, Sun, Scissors } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
