@@ -154,6 +154,7 @@ export default function Payments() {
     setStaffMember(lastTx.staffMember);
     setPayAmount(String(lastTx.amount));
     setPaymentMethod(lastTx.paymentMethod);
+    setServiceType(lastTx.serviceType || "");
     toast.info("Last payment loaded — tap Add to confirm");
   };
 
