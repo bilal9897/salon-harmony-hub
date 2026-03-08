@@ -39,49 +39,42 @@ export default function DailyCash() {
     toast.success("Daily cash recorded!");
   };
 
+  const cards = [
+    { label: "Total Revenue", value: fmt(totalRevenue), sub: `Cash: ${fmt(cashRevenue)}`, icon: ArrowUpRight, iconClass: "text-success" },
+    { label: "Total Expenses", value: fmt(totalExpenses), icon: ArrowDownRight, iconClass: "text-destructive" },
+    { label: "Expected Cash", value: fmt(expectedCash), sub: "Cash revenue − expenses", icon: Wallet, iconClass: "text-primary" },
+  ];
+
   return (
     <div>
-      <PageHeader title="Daily Cash Reconciliation" description="Compare expected vs actual cash at end of day" />
+      <PageHeader title="Daily Cash" description="Compare expected vs actual cash at end of day" icon={Wallet} />
 
       <div className="mb-6">
-        <Label>Select Date</Label>
-        <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="mt-1 w-48" />
+        <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Select Date</Label>
+        <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="mt-1.5 w-48 rounded-xl" />
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-8">
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="stat-card">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-            <ArrowUpRight className="h-4 w-4 text-success" /> Total Revenue
-          </div>
-          <p className="text-2xl font-display font-bold">{fmt(totalRevenue)}</p>
-          <p className="text-xs text-muted-foreground mt-1">Cash: {fmt(cashRevenue)}</p>
-        </motion.div>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+        {cards.map((c, i) => (
+          <motion.div key={c.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} className="card-elevated">
+            <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground mb-2">
+              <c.icon className={`h-3.5 w-3.5 ${c.iconClass}`} /> {c.label}
+            </div>
+            <p className="text-2xl font-display font-bold text-foreground">{c.value}</p>
+            {c.sub && <p className="text-xs text-muted-foreground mt-1">{c.sub}</p>}
+          </motion.div>
+        ))}
 
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="stat-card">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-            <ArrowDownRight className="h-4 w-4 text-destructive" /> Total Expenses
-          </div>
-          <p className="text-2xl font-display font-bold">{fmt(totalExpenses)}</p>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="stat-card">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-            <Wallet className="h-4 w-4 text-primary" /> Expected Cash
-          </div>
-          <p className="text-2xl font-display font-bold">{fmt(expectedCash)}</p>
-          <p className="text-xs text-muted-foreground mt-1">Cash revenue − expenses</p>
-        </motion.div>
-
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }} className="stat-card">
-          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-            <Scale className="h-4 w-4 text-accent" /> Difference
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} className="card-elevated">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-muted-foreground mb-2">
+            <Scale className="h-3.5 w-3.5 text-accent-foreground" /> Difference
           </div>
           {difference !== null ? (
             <>
               <p className={`text-2xl font-display font-bold ${difference >= 0 ? 'text-success' : 'text-destructive'}`}>
                 {difference >= 0 ? '+' : ''}{fmt(difference)}
               </p>
-              <div className="flex items-center gap-1 mt-1">
+              <div className="flex items-center gap-1.5 mt-1">
                 {difference >= 0 ? (
                   <CheckCircle2 className="h-3 w-3 text-success" />
                 ) : (
@@ -98,8 +91,8 @@ export default function DailyCash() {
         </motion.div>
       </div>
 
-      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="stat-card max-w-md">
-        <h3 className="font-display text-lg font-semibold mb-4">Enter Actual Cash</h3>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card-elevated max-w-md">
+        <h3 className="section-title mb-4">Enter Actual Cash</h3>
         <div className="flex gap-3">
           <Input
             type="number"
@@ -107,12 +100,13 @@ export default function DailyCash() {
             placeholder="Enter cash in hand"
             value={actualCash}
             onChange={e => setActualCash(e.target.value)}
+            className="rounded-xl"
           />
-          <Button onClick={handleSave}>Save</Button>
+          <Button onClick={handleSave} className="rounded-xl">Save</Button>
         </div>
         {entry && (
           <p className="mt-3 text-sm text-muted-foreground">
-            Recorded: {fmt(entry.actualCash)}
+            Recorded: <span className="font-medium text-foreground">{fmt(entry.actualCash)}</span>
           </p>
         )}
       </motion.div>

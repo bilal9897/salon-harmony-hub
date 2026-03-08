@@ -11,6 +11,7 @@ import Expenses from "./pages/Expenses";
 import DailyCash from "./pages/DailyCash";
 import Scanner from "./pages/Scanner";
 import Reports from "./pages/Reports";
+import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/daily-cash" element={<DailyCash />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/scanner" element={<Scanner />} />
+            <Route path="/settings" element={<SettingsPage />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
