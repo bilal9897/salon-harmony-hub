@@ -17,19 +17,16 @@ const WHITE: [number, number, number] = [255, 255, 255];
 
 function drawBrandedHeader(doc: jsPDF, title: string, subtitle: string) {
   const pw = doc.internal.pageSize.getWidth();
-  // Teal header bar
+  const name = getSalonName();
   doc.setFillColor(...TEAL);
   doc.rect(0, 0, pw, 38, "F");
-  // Brand name
   doc.setTextColor(...WHITE);
   doc.setFontSize(24);
   doc.setFont("helvetica", "bold");
-  doc.text("Fresh Saloon", pw / 2, 16, { align: "center" });
-  // Title
+  doc.text(name, pw / 2, 16, { align: "center" });
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
   doc.text(title, pw / 2, 25, { align: "center" });
-  // Subtitle
   doc.setFontSize(8);
   doc.text(subtitle, pw / 2, 32, { align: "center" });
 }
