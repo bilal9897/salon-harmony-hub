@@ -170,10 +170,16 @@ export default function Reports() {
               />
             )}
           </div>
-          <Button onClick={handleExport} className="gap-2 rounded-xl h-11 px-6">
-            {reportType === "daily" ? <Receipt className="h-4 w-4" /> : <FileDown className="h-4 w-4" />}
-            {reportType === "daily" ? "Download Receipt" : "Download PDF"}
-          </Button>
+          <div className="flex gap-2">
+            <Button onClick={handleExport} className="gap-2 rounded-xl h-11 px-5 flex-1">
+              {reportType === "daily" ? <Receipt className="h-4 w-4" /> : <FileDown className="h-4 w-4" />}
+              {reportType === "daily" ? "Receipt" : "PDF"}
+            </Button>
+            <Button onClick={handleWhatsAppShare} variant="outline" className="gap-2 rounded-xl h-11 px-5 text-success border-success/30 hover:bg-success/10">
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp
+            </Button>
+          </div>
         </div>
         <p className="text-sm text-muted-foreground mt-3">
           Showing data for: <span className="font-medium text-foreground">{periodLabel}</span>
