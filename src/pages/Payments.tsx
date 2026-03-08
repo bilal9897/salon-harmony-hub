@@ -64,6 +64,16 @@ export default function Payments() {
     setServiceType("");
   };
 
+  const lastTx = transactions[0];
+  const handleRepeat = () => {
+    if (!lastTx) return;
+    setServiceType(lastTx.serviceType);
+    setStaffMember(lastTx.staffMember);
+    setAmount(String(lastTx.amount));
+    setPaymentMethod(lastTx.paymentMethod);
+    toast.info("Last payment loaded — tap Add to confirm");
+  };
+
   return (
     <div>
       <PageHeader title="Payments" description="Quick-add client payments" icon={CreditCard} />
