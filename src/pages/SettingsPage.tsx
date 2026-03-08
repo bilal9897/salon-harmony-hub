@@ -250,10 +250,10 @@ function BackupRestore() {
         </div>
         <div>
           <h3 className="section-title">Backup & Restore</h3>
-          <p className="text-xs text-muted-foreground">Export or import your salon data as a JSON file</p>
+          <p className="text-xs text-muted-foreground">Export or import salon data as JSON</p>
         </div>
       </div>
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <Button onClick={handleExport} className="flex-1 rounded-xl gap-2">
           <Download className="h-4 w-4" /> Export Backup
         </Button>
