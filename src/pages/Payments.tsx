@@ -103,7 +103,7 @@ export default function Payments() {
   const shareGmail = () => {
     const text = buildReportText().replace(/\*/g, "");
     const subject = `Fresh Saloon — Daily Report ${today}`;
-    const mailtoLink = `mailto:freshsalon@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+    const mailtoLink = `mailto:${encodeURIComponent(gmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
     window.location.href = mailtoLink;
   };
 
