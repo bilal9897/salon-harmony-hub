@@ -50,6 +50,7 @@ export default function Payments() {
 
   // Report contacts
   const { whatsapp, gmail, salonName } = useReportContacts();
+  const { paymentPresets, expensePresets } = useAmountPresets();
 
   // Expense state
   const { expenses, addExpense, deleteExpense } = useExpenses();
