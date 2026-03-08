@@ -102,7 +102,6 @@ export default function Payments() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-end">
-          </div>
 
           <div className="space-y-2">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Method</Label>
