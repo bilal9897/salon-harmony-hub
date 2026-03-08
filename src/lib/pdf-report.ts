@@ -446,5 +446,6 @@ export function generateAnnualReport(
   }
 
   drawFooter(doc);
-  doc.save(`FreshSaloon_Annual_${year}.pdf`);
+  const safeName = getSalonName().replace(/\s+/g, '_');
+  doc.save(`${safeName}_Annual_${year}.pdf`);
 }

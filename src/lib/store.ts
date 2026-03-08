@@ -214,6 +214,11 @@ export const EXPENSE_CATEGORIES = [
 
 const DEFAULT_WHATSAPP = '918197925360';
 const DEFAULT_GMAIL = 'freshsalon@gmail.com';
+const DEFAULT_SALON_NAME = 'Fresh Saloon';
+
+export function getSalonName(): string {
+  return localStorage.getItem(STORAGE_KEYS.salonName) || DEFAULT_SALON_NAME;
+}
 
 export function useReportContacts() {
   const [whatsapp, setWhatsappState] = useState(() =>
@@ -221,6 +226,9 @@ export function useReportContacts() {
   );
   const [gmail, setGmailState] = useState(() =>
     localStorage.getItem(STORAGE_KEYS.gmailAddress) || DEFAULT_GMAIL
+  );
+  const [salonName, setSalonNameState] = useState(() =>
+    localStorage.getItem(STORAGE_KEYS.salonName) || DEFAULT_SALON_NAME
   );
 
   const setWhatsapp = useCallback((val: string) => {
@@ -233,5 +241,10 @@ export function useReportContacts() {
     localStorage.setItem(STORAGE_KEYS.gmailAddress, val);
   }, []);
 
-  return { whatsapp, gmail, setWhatsapp, setGmail };
+  const setSalonName = useCallback((val: string) => {
+    setSalonNameState(val);
+    localStorage.setItem(STORAGE_KEYS.salonName, val);
+  }, []);
+
+  return { whatsapp, gmail, salonName, setWhatsapp, setGmail, setSalonName };
 }
