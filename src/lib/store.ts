@@ -30,6 +30,8 @@ const STORAGE_KEYS = {
   dailyCash: 'salon_daily_cash',
   staffMembers: 'salon_staff_members',
   serviceTypes: 'salon_service_types',
+  whatsappNumber: 'salon_whatsapp_number',
+  gmailAddress: 'salon_gmail_address',
 };
 
 const DEFAULT_STAFF = ['Azam', 'Shahnawaz', 'Aalam'];
