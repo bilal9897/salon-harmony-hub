@@ -9,12 +9,12 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 const CHART_COLORS = [
-  "hsl(262, 60%, 50%)",
-  "hsl(340, 65%, 55%)",
+  "hsl(174, 60%, 36%)",
+  "hsl(38, 85%, 52%)",
   "hsl(152, 58%, 38%)",
-  "hsl(38, 92%, 50%)",
-  "hsl(210, 80%, 52%)",
-  "hsl(20, 80%, 52%)",
+  "hsl(0, 65%, 55%)",
+  "hsl(210, 70%, 50%)",
+  "hsl(28, 80%, 52%)",
 ];
 
 function fmt(n: number) {
@@ -32,7 +32,6 @@ export default function Dashboard() {
   const todayRevenue = todayTx.reduce((s, t) => s + t.amount, 0);
   const todayExpenses = todayExp.reduce((s, e) => s + e.amount, 0);
   const todayProfit = todayRevenue - todayExpenses;
-  const totalRevenue = transactions.reduce((s, t) => s + t.amount, 0);
 
   const staffStats = useMemo(() => getStaffStats(transactions), [transactions]);
   const expenseBreakdown = useMemo(() => getExpensesByCategory(expenses), [expenses]);
@@ -95,15 +94,15 @@ export default function Dashboard() {
             <AreaChart data={revenueTrend}>
               <defs>
                 <linearGradient id="revenueGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(262, 60%, 50%)" stopOpacity={0.2} />
-                  <stop offset="100%" stopColor="hsl(262, 60%, 50%)" stopOpacity={0} />
+                  <stop offset="0%" stopColor="hsl(174, 60%, 36%)" stopOpacity={0.2} />
+                  <stop offset="100%" stopColor="hsl(174, 60%, 36%)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,13%,91%)" vertical={false} />
-              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'hsl(220,10%,46%)' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: 'hsl(220,10%,46%)' }} axisLine={false} tickLine={false} />
-              <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ borderRadius: 12, border: '1px solid hsl(220,13%,91%)', fontSize: 13 }} />
-              <Area type="monotone" dataKey="revenue" stroke="hsl(262,60%,50%)" strokeWidth={2.5} fill="url(#revenueGrad)" dot={{ r: 3, fill: 'hsl(262,60%,50%)' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(40,13%,89%)" vertical={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 11, fill: 'hsl(30,8%,46%)' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 11, fill: 'hsl(30,8%,46%)' }} axisLine={false} tickLine={false} />
+              <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ borderRadius: 12, border: '1px solid hsl(40,13%,89%)', fontSize: 13 }} />
+              <Area type="monotone" dataKey="revenue" stroke="hsl(174,60%,36%)" strokeWidth={2.5} fill="url(#revenueGrad)" dot={{ r: 3, fill: 'hsl(174,60%,36%)' }} />
             </AreaChart>
           </ResponsiveContainer>
         </motion.div>
@@ -117,10 +116,10 @@ export default function Dashboard() {
           ) : (
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={staffStats}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,13%,91%)" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'hsl(220,10%,46%)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: 'hsl(220,10%,46%)' }} axisLine={false} tickLine={false} />
-                <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ borderRadius: 12, border: '1px solid hsl(220,13%,91%)', fontSize: 13 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(40,13%,89%)" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'hsl(30,8%,46%)' }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: 'hsl(30,8%,46%)' }} axisLine={false} tickLine={false} />
+                <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ borderRadius: 12, border: '1px solid hsl(40,13%,89%)', fontSize: 13 }} />
                 <Bar dataKey="revenue" radius={[8, 8, 0, 0]} maxBarSize={40}>
                   {staffStats.map((_, i) => (
                     <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
@@ -146,7 +145,7 @@ export default function Dashboard() {
                       <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ borderRadius: 12, border: '1px solid hsl(220,13%,91%)', fontSize: 13 }} />
+                  <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ borderRadius: 12, border: '1px solid hsl(40,13%,89%)', fontSize: 13 }} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="flex flex-wrap gap-x-6 gap-y-3">
