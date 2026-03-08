@@ -1,90 +1,177 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useTransactions, useExpenses, getStaffStats, getExpensesByCategory } from "@/lib/store";
-import { generateMonthlyReport } from "@/lib/pdf-report";
+import { useTransactions, useExpenses, getToday, getStaffStats, getExpensesByCategory } from "@/lib/store";
+import { generateDailyReport, generateMonthlyReport, generateAnnualReport } from "@/lib/pdf-report";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileDown, IndianRupee, TrendingDown, TrendingUp, Users, FileBarChart } from "lucide-react";
+import { FileDown, IndianRupee, TrendingDown, TrendingUp, Users, FileBarChart, Calendar, CalendarDays, CalendarRange, Receipt } from "lucide-react";
 import { StatCard } from "@/components/StatCard";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
-import { useMemo } from "react";
 
 const COLORS = [
-  "hsl(262, 60%, 50%)",
-  "hsl(340, 65%, 55%)",
+  "hsl(174, 60%, 36%)",
+  "hsl(38, 85%, 52%)",
   "hsl(152, 58%, 38%)",
-  "hsl(38, 92%, 50%)",
-  "hsl(210, 80%, 52%)",
-  "hsl(20, 80%, 52%)",
+  "hsl(0, 65%, 55%)",
+  "hsl(210, 70%, 50%)",
+  "hsl(28, 80%, 52%)",
 ];
 
 function fmt(n: number) {
   return `₹${n.toLocaleString("en-IN")}`;
 }
 
+type ReportType = "daily" | "monthly" | "annual";
+
 export default function Reports() {
   const { transactions } = useTransactions();
   const { expenses } = useExpenses();
+  const [reportType, setReportType] = useState<ReportType>("daily");
+  const [date, setDate] = useState(getToday());
   const [month, setMonth] = useState(() => new Date().toISOString().slice(0, 7));
+  const [year, setYear] = useState(() => String(new Date().getFullYear()));
 
-  const monthTx = useMemo(() => transactions.filter((t) => t.date.startsWith(month)), [transactions, month]);
-  const monthExp = useMemo(() => expenses.filter((e) => e.date.startsWith(month)), [expenses, month]);
+  // Filter data based on report type
+  const filteredTx = useMemo(() => {
+    if (reportType === "daily") return transactions.filter((t) => t.date === date);
+    if (reportType === "monthly") return transactions.filter((t) => t.date.startsWith(month));
+    return transactions.filter((t) => t.date.startsWith(year));
+  }, [transactions, reportType, date, month, year]);
 
-  const totalRevenue = monthTx.reduce((s, t) => s + t.amount, 0);
-  const totalExpenses = monthExp.reduce((s, e) => s + e.amount, 0);
+  const filteredExp = useMemo(() => {
+    if (reportType === "daily") return expenses.filter((e) => e.date === date);
+    if (reportType === "monthly") return expenses.filter((e) => e.date.startsWith(month));
+    return expenses.filter((e) => e.date.startsWith(year));
+  }, [expenses, reportType, date, month, year]);
+
+  const totalRevenue = filteredTx.reduce((s, t) => s + t.amount, 0);
+  const totalExpenses = filteredExp.reduce((s, e) => s + e.amount, 0);
   const profit = totalRevenue - totalExpenses;
-  const staffStats = useMemo(() => getStaffStats(monthTx), [monthTx]);
-  const expenseBreakdown = useMemo(() => getExpensesByCategory(monthExp), [monthExp]);
+  const staffStats = useMemo(() => getStaffStats(filteredTx), [filteredTx]);
+  const expenseBreakdown = useMemo(() => getExpensesByCategory(filteredExp), [filteredExp]);
 
   const handleExport = () => {
-    generateMonthlyReport(month, transactions, expenses);
-    toast.success("PDF report downloaded!");
+    if (reportType === "daily") {
+      generateDailyReport(date, transactions, expenses);
+      toast.success("Daily receipt downloaded!");
+    } else if (reportType === "monthly") {
+      generateMonthlyReport(month, transactions, expenses);
+      toast.success("Monthly report downloaded!");
+    } else {
+      generateAnnualReport(year, transactions, expenses);
+      toast.success("Annual report downloaded!");
+    }
   };
 
-  const label = new Date(month + "-01").toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+  const periodLabel = useMemo(() => {
+    if (reportType === "daily") return new Date(date).toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "long", year: "numeric" });
+    if (reportType === "monthly") return new Date(month + "-01").toLocaleDateString("en-IN", { month: "long", year: "numeric" });
+    return year;
+  }, [reportType, date, month, year]);
+
+  const tabs: { key: ReportType; label: string; icon: React.ElementType }[] = [
+    { key: "daily", label: "Daily", icon: Calendar },
+    { key: "monthly", label: "Monthly", icon: CalendarDays },
+    { key: "annual", label: "Annual", icon: CalendarRange },
+  ];
 
   return (
     <div>
       <PageHeader
-        title="Monthly Reports"
-        description="Review and export monthly performance data"
+        title="Reports"
+        description="Download daily receipts, monthly & annual reports"
         icon={FileBarChart}
-        actions={
-          <Button onClick={handleExport} className="gap-2 rounded-xl">
-            <FileDown className="h-4 w-4" /> Export PDF
-          </Button>
-        }
       />
 
-      <div className="mb-6">
-        <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Select Month</Label>
-        <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="mt-1.5 w-48 rounded-xl" />
+      {/* Report Type Tabs */}
+      <div className="flex gap-2 mb-5">
+        {tabs.map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            onClick={() => setReportType(key)}
+            className={`flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-150 border ${
+              reportType === key
+                ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                : "bg-card text-foreground border-border hover:border-primary/40 hover:bg-accent/50"
+            }`}
+          >
+            <Icon className="h-4 w-4" />
+            {label}
+          </button>
+        ))}
       </div>
 
+      {/* Date Picker + Download */}
+      <motion.div
+        key={reportType}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="card-elevated mb-6"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+          <div className="flex-1">
+            <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              {reportType === "daily" ? "Select Date" : reportType === "monthly" ? "Select Month" : "Select Year"}
+            </Label>
+            {reportType === "daily" && (
+              <Input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="mt-1.5 rounded-xl" />
+            )}
+            {reportType === "monthly" && (
+              <Input type="month" value={month} onChange={(e) => setMonth(e.target.value)} className="mt-1.5 rounded-xl" />
+            )}
+            {reportType === "annual" && (
+              <Input
+                type="number"
+                min="2020"
+                max="2099"
+                value={year}
+                onChange={(e) => setYear(e.target.value)}
+                className="mt-1.5 rounded-xl"
+              />
+            )}
+          </div>
+          <Button onClick={handleExport} className="gap-2 rounded-xl h-11 px-6">
+            {reportType === "daily" ? <Receipt className="h-4 w-4" /> : <FileDown className="h-4 w-4" />}
+            {reportType === "daily" ? "Download Receipt" : "Download PDF"}
+          </Button>
+        </div>
+        <p className="text-sm text-muted-foreground mt-3">
+          Showing data for: <span className="font-medium text-foreground">{periodLabel}</span>
+        </p>
+      </motion.div>
+
+      {/* Stats */}
       <div className="page-grid mb-6">
-        <StatCard title={`${label} Revenue`} value={fmt(totalRevenue)} icon={IndianRupee} />
+        <StatCard title="Revenue" value={fmt(totalRevenue)} icon={IndianRupee} />
         <StatCard title="Expenses" value={fmt(totalExpenses)} icon={TrendingDown} />
-        <StatCard title="Net Profit" value={fmt(profit)} icon={TrendingUp} trend={profit >= 0 ? "Profitable" : "Loss"} trendUp={profit >= 0} />
-        <StatCard title="Transactions" value={String(monthTx.length)} icon={Users} />
+        <StatCard
+          title="Net Profit"
+          value={fmt(profit)}
+          icon={TrendingUp}
+          trend={profit >= 0 ? "Profitable" : "Loss"}
+          trendUp={profit >= 0}
+        />
+        <StatCard title="Transactions" value={String(filteredTx.length)} icon={Users} />
       </div>
 
+      {/* Charts */}
       <div className="grid gap-5 lg:grid-cols-2">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="card-elevated">
           <h3 className="section-title mb-5">Staff Performance</h3>
           {staffStats.length === 0 ? (
-            <div className="flex h-[240px] items-center justify-center">
-              <p className="text-sm text-muted-foreground">No data for this month.</p>
+            <div className="flex h-[200px] items-center justify-center">
+              <p className="text-sm text-muted-foreground">No data for this period.</p>
             </div>
           ) : (
-            <ResponsiveContainer width="100%" height={240}>
+            <ResponsiveContainer width="100%" height={220}>
               <BarChart data={staffStats}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(220,13%,91%)" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'hsl(220,10%,46%)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: 'hsl(220,10%,46%)' }} axisLine={false} tickLine={false} />
-                <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ borderRadius: 12, border: '1px solid hsl(220,13%,91%)', fontSize: 13 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke="hsl(40,13%,89%)" vertical={false} />
+                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "hsl(30,8%,46%)" }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 11, fill: "hsl(30,8%,46%)" }} axisLine={false} tickLine={false} />
+                <Tooltip formatter={(v: number) => fmt(v)} contentStyle={{ borderRadius: 12, border: "1px solid hsl(40,13%,89%)", fontSize: 13 }} />
                 <Bar dataKey="revenue" radius={[8, 8, 0, 0]} maxBarSize={40}>
                   {staffStats.map((_, i) => (
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
@@ -98,13 +185,13 @@ export default function Reports() {
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }} className="card-elevated">
           <h3 className="section-title mb-5">Expense Breakdown</h3>
           {expenseBreakdown.length === 0 ? (
-            <div className="flex h-[240px] items-center justify-center">
-              <p className="text-sm text-muted-foreground">No expenses this month.</p>
+            <div className="flex h-[200px] items-center justify-center">
+              <p className="text-sm text-muted-foreground">No expenses for this period.</p>
             </div>
           ) : (
             <div className="space-y-3">
               {expenseBreakdown.map((e, i) => {
-                const maxAmount = Math.max(...expenseBreakdown.map(x => x.amount));
+                const maxAmount = Math.max(...expenseBreakdown.map((x) => x.amount));
                 const pct = maxAmount > 0 ? (e.amount / maxAmount) * 100 : 0;
                 return (
                   <div key={e.category}>
