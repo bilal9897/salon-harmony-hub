@@ -83,7 +83,7 @@ export default function Payments() {
   const shareGmail = () => {
     const text = buildReportText().replace(/\*/g, "");
     const subject = `Fresh Saloon — Daily Report ${today}`;
-    window.open(`https://mail.google.com/mail/?view=cm&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`, "_blank");
+    window.open(`https://mail.google.com/mail/?view=cm&to=freshsalon@gmail.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`, "_blank");
   };
 
   const handlePaymentSubmit = (e: React.FormEvent) => {
