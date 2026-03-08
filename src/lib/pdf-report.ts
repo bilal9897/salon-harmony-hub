@@ -190,7 +190,8 @@ export function generateDailyReport(
   }
 
   drawFooter(doc);
-  doc.save(`FreshSaloon_Daily_${date}.pdf`);
+  const safeName = getSalonName().replace(/\s+/g, '_');
+  doc.save(`${safeName}_Daily_${date}.pdf`);
 }
 
 // ─── MONTHLY REPORT ──────────────────────────────────────────────────────────
