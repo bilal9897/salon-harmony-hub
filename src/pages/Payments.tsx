@@ -144,9 +144,16 @@ export default function Payments() {
             </div>
           </div>
 
-          <Button type="submit" className="gap-2 rounded-xl h-12 text-base">
-            <Plus className="h-4 w-4" /> Add Payment
-          </Button>
+          <div className="flex gap-2">
+            {lastTx && (
+              <Button type="button" variant="outline" onClick={handleRepeat} className="gap-2 rounded-xl h-12 text-base">
+                <RotateCcw className="h-4 w-4" /> Repeat Last
+              </Button>
+            )}
+            <Button type="submit" className="gap-2 rounded-xl h-12 text-base flex-1">
+              <Plus className="h-4 w-4" /> Add Payment
+            </Button>
+          </div>
         </div>
       </motion.form>
 
