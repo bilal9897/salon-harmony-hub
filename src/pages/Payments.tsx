@@ -48,6 +48,9 @@ export default function Payments() {
   const [payDate, setPayDate] = useState(getToday());
   const [payTime, setPayTime] = useState(new Date().toTimeString().slice(0, 5));
 
+  // Report contacts
+  const { whatsapp, gmail } = useReportContacts();
+
   // Expense state
   const { expenses, addExpense, deleteExpense } = useExpenses();
   const [expCategory, setExpCategory] = useState("");
