@@ -77,14 +77,31 @@ export default function Payments() {
         <ChipSelect items={services} value={serviceType} onChange={setServiceType} label="Service" />
         <ChipSelect items={staff} value={staffMember} onChange={setStaffMember} label="Staff" />
 
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 items-end">
-          <div className="space-y-2">
-            <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Amount (₹)</Label>
-            <div className="relative">
-              <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input type="number" min="1" placeholder="500" value={amount} onChange={e => setAmount(e.target.value)} className="rounded-xl h-12 text-lg pl-9 font-semibold" />
-            </div>
+        <div className="space-y-2">
+          <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Amount (₹)</Label>
+          <div className="flex flex-wrap gap-2">
+            {[200, 500, 1000, 1500, 2000].map(preset => (
+              <button
+                key={preset}
+                type="button"
+                onClick={() => setAmount(String(preset))}
+                className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-150 border ${
+                  amount === String(preset)
+                    ? "bg-primary text-primary-foreground border-primary shadow-sm scale-[1.02]"
+                    : "bg-card text-foreground border-border hover:border-primary/40 hover:bg-accent/50"
+                }`}
+              >
+                ₹{preset.toLocaleString('en-IN')}
+              </button>
+            ))}
           </div>
+          <div className="relative">
+            <IndianRupee className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input type="number" min="1" placeholder="Custom amount" value={amount} onChange={e => setAmount(e.target.value)} className="rounded-xl h-12 text-lg pl-9 font-semibold" />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-end">
 
           <div className="space-y-2">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Method</Label>
