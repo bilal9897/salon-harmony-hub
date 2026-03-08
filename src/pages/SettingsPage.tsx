@@ -177,12 +177,12 @@ function InstallPWA() {
       </div>
       {isInstalled ? (
         <p className="text-sm text-muted-foreground flex items-center gap-2">
-          <Check className="h-4 w-4 text-green-500" /> App is already installed
+          <Check className="h-4 w-4 text-primary" /> App is already installed
         </p>
       ) : (
         <Button onClick={handleInstall} className="w-full rounded-xl gap-2">
           <Download className="h-4 w-4" />
-          Install Fresh Saloon
+          Install {getSalonName()}
         </Button>
       )}
     </motion.div>
