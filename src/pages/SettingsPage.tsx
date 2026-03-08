@@ -1,9 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { useStaffMembers } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users } from "lucide-react";
+import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Smartphone } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
