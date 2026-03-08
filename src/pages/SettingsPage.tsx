@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useStaffMembers, useServiceTypes } from "@/lib/store";
+import { useStaffMembers } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Scissors } from "lucide-react";
+import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -132,13 +132,12 @@ function EditableList({
 
 export default function SettingsPage() {
   const { staff, addStaff, removeStaff, updateStaff } = useStaffMembers();
-  const { services, addService, removeService, updateService } = useServiceTypes();
 
   return (
     <div>
-      <PageHeader title="Settings" description="Manage your salon's staff members and service types" icon={SettingsIcon} />
+      <PageHeader title="Settings" description="Manage your salon's staff members" icon={SettingsIcon} />
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="max-w-lg">
         <EditableList
           title="Staff Members"
           icon={Users}
@@ -147,16 +146,6 @@ export default function SettingsPage() {
           onRemove={removeStaff}
           onUpdate={updateStaff}
           placeholder="Add new staff member..."
-        />
-
-        <EditableList
-          title="Service Types"
-          icon={Scissors}
-          items={services}
-          onAdd={addService}
-          onRemove={removeService}
-          onUpdate={updateService}
-          placeholder="Add new service type..."
         />
       </div>
     </div>

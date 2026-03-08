@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useTransactions, useStaffMembers, useServiceTypes, getToday } from "@/lib/store";
+import { useTransactions, useStaffMembers, getToday } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,8 +36,6 @@ function ChipSelect({ items, value, onChange, label }: { items: string[]; value:
 export default function Payments() {
   const { transactions, addTransaction, deleteTransaction } = useTransactions();
   const { staff } = useStaffMembers();
-  const { services } = useServiceTypes();
-  const [serviceType, setServiceType] = useState("");
   const [staffMember, setStaffMember] = useState("");
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("cash");
@@ -46,13 +44,13 @@ export default function Payments() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!serviceType || !staffMember || !amount || Number(amount) <= 0) {
-      toast.error("Please select service, staff, and enter amount.");
+    if (!staffMember || !amount || Number(amount) <= 0) {
+      toast.error("Please select staff and enter amount.");
       return;
     }
     addTransaction({
       clientName: "Walk-in",
-      serviceType,
+      serviceType: "General",
       staffMember,
       amount: Number(amount),
       paymentMethod,
@@ -61,13 +59,11 @@ export default function Payments() {
     });
     toast.success("✅ Payment recorded!");
     setAmount("");
-    setServiceType("");
   };
 
   const lastTx = transactions[0];
   const handleRepeat = () => {
     if (!lastTx) return;
-    setServiceType(lastTx.serviceType);
     setStaffMember(lastTx.staffMember);
     setAmount(String(lastTx.amount));
     setPaymentMethod(lastTx.paymentMethod);
@@ -84,7 +80,6 @@ export default function Payments() {
         onSubmit={handleSubmit}
         className="form-section space-y-5"
       >
-        <ChipSelect items={services} value={serviceType} onChange={setServiceType} label="Service" />
         <ChipSelect items={staff} value={staffMember} onChange={setStaffMember} label="Staff" />
 
         <div className="space-y-2">
@@ -112,7 +107,6 @@ export default function Payments() {
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 items-end">
-
           <div className="space-y-2">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Method</Label>
             <div className="flex rounded-xl border overflow-hidden h-12">
@@ -163,7 +157,6 @@ export default function Payments() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="text-xs uppercase tracking-wider">Service</TableHead>
                 <TableHead className="text-xs uppercase tracking-wider">Staff</TableHead>
                 <TableHead className="text-xs uppercase tracking-wider">Amount</TableHead>
                 <TableHead className="text-xs uppercase tracking-wider">Method</TableHead>
@@ -174,7 +167,7 @@ export default function Payments() {
             <TableBody>
               {transactions.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-16">
+                  <TableCell colSpan={5} className="text-center text-muted-foreground py-16">
                     <div className="space-y-2">
                       <CreditCard className="mx-auto h-8 w-8 text-muted-foreground/40" />
                       <p>No payments yet — add one above!</p>
@@ -184,8 +177,7 @@ export default function Payments() {
               ) : (
                 transactions.slice(0, 50).map(t => (
                   <TableRow key={t.id} className="group">
-                    <TableCell className="font-medium">{t.serviceType}</TableCell>
-                    <TableCell>{t.staffMember}</TableCell>
+                    <TableCell className="font-medium">{t.staffMember}</TableCell>
                     <TableCell className="font-semibold">₹{t.amount.toLocaleString('en-IN')}</TableCell>
                     <TableCell>
                       <span className={`badge-soft ${t.paymentMethod === 'cash' ? 'bg-success/10 text-success' : 'bg-info/10 text-info'}`}>
