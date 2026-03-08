@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useStaffMembers, useReportContacts, useAmountPresets } from "@/lib/store";
+import { useStaffMembers, useReportContacts, useAmountPresets, getSalonName } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
