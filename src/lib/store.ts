@@ -253,3 +253,26 @@ export function useReportContacts() {
 
   return { whatsapp, gmail, salonName, setWhatsapp, setGmail, setSalonName };
 }
+
+export function useAmountPresets() {
+  const [paymentPresets, setPaymentPresetsState] = useState<number[]>(() =>
+    load<number>(STORAGE_KEYS.paymentPresets, DEFAULT_PAYMENT_PRESETS)
+  );
+  const [expensePresets, setExpensePresetsState] = useState<number[]>(() =>
+    load<number>(STORAGE_KEYS.expensePresets, DEFAULT_EXPENSE_PRESETS)
+  );
+
+  const setPaymentPresets = useCallback((presets: number[]) => {
+    const sorted = [...presets].sort((a, b) => a - b);
+    setPaymentPresetsState(sorted);
+    save(STORAGE_KEYS.paymentPresets, sorted);
+  }, []);
+
+  const setExpensePresets = useCallback((presets: number[]) => {
+    const sorted = [...presets].sort((a, b) => a - b);
+    setExpensePresetsState(sorted);
+    save(STORAGE_KEYS.expensePresets, sorted);
+  }, []);
+
+  return { paymentPresets, expensePresets, setPaymentPresets, setExpensePresets };
+}
