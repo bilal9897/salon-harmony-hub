@@ -402,6 +402,7 @@ export default function Payments() {
                   transactions.slice(0, 50).map(t => (
                     <TableRow key={t.id} className="group">
                       <TableCell className="font-medium">{t.staffMember}</TableCell>
+                      <TableCell className="text-muted-foreground text-sm">{t.serviceType || "—"}</TableCell>
                       <TableCell className="font-semibold">₹{t.amount.toLocaleString('en-IN')}</TableCell>
                       <TableCell>
                         <span className={`badge-soft ${t.paymentMethod === 'cash' ? 'bg-success/10 text-success' : 'bg-info/10 text-info'}`}>
