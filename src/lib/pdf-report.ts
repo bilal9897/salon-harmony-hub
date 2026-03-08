@@ -2,48 +2,77 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Transaction, Expense, getStaffStats, getExpensesByCategory } from "./store";
 
+// jsPDF default fonts don't support ₹, so use "Rs." in PDFs
 function fmt(n: number) {
-  return `₹${n.toLocaleString("en-IN")}`;
+  return `Rs. ${n.toLocaleString("en-IN")}`;
 }
 
-const BRAND_COLOR: [number, number, number] = [13, 148, 136]; // teal
-const DARK_BG: [number, number, number] = [45, 38, 35];
+const TEAL: [number, number, number] = [13, 148, 136];
+const DARK: [number, number, number] = [30, 30, 30];
+const GRAY: [number, number, number] = [100, 100, 100];
+const LIGHT_BG: [number, number, number] = [245, 245, 244];
+const WHITE: [number, number, number] = [255, 255, 255];
 
-function addHeader(doc: jsPDF, title: string, subtitle: string) {
-  const pageWidth = doc.internal.pageSize.getWidth();
-  doc.setFillColor(...DARK_BG);
-  doc.rect(0, 0, pageWidth, 40, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(22);
-  doc.text("GlamBook", 14, 18);
+// ─── SHARED HELPERS ──────────────────────────────────────────────────────────
+
+function drawBrandedHeader(doc: jsPDF, title: string, subtitle: string) {
+  const pw = doc.internal.pageSize.getWidth();
+  // Teal header bar
+  doc.setFillColor(...TEAL);
+  doc.rect(0, 0, pw, 38, "F");
+  // Brand name
+  doc.setTextColor(...WHITE);
+  doc.setFontSize(24);
+  doc.setFont("helvetica", "bold");
+  doc.text("GlamBook", pw / 2, 16, { align: "center" });
+  // Title
   doc.setFontSize(11);
-  doc.text(title, 14, 28);
-  doc.setFontSize(9);
-  doc.text(subtitle, 14, 35);
+  doc.setFont("helvetica", "normal");
+  doc.text(title, pw / 2, 25, { align: "center" });
+  // Subtitle
+  doc.setFontSize(8);
+  doc.text(subtitle, pw / 2, 32, { align: "center" });
 }
 
-function addFooter(doc: jsPDF) {
-  const pageWidth = doc.internal.pageSize.getWidth();
-  const pageCount = doc.getNumberOfPages();
-  for (let i = 1; i <= pageCount; i++) {
+function drawFooter(doc: jsPDF) {
+  const pw = doc.internal.pageSize.getWidth();
+  const ph = doc.internal.pageSize.getHeight();
+  const pages = doc.getNumberOfPages();
+  for (let i = 1; i <= pages; i++) {
     doc.setPage(i);
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text(
-      `Page ${i} of ${pageCount} — GlamBook Salon Management`,
-      pageWidth / 2,
-      doc.internal.pageSize.getHeight() - 8,
-      { align: "center" }
-    );
+    // Thin teal line
+    doc.setDrawColor(...TEAL);
+    doc.setLineWidth(0.5);
+    doc.line(14, ph - 14, pw - 14, ph - 14);
+    // Footer text
+    doc.setFontSize(7);
+    doc.setTextColor(...GRAY);
+    doc.setFont("helvetica", "normal");
+    doc.text("GlamBook Salon Management", 14, ph - 9);
+    doc.text(`Page ${i} of ${pages}`, pw - 14, ph - 9, { align: "right" });
   }
 }
 
-const tableHead: [number, number, number] = BRAND_COLOR;
+function sectionTitle(doc: jsPDF, title: string, y: number): number {
+  doc.setFontSize(13);
+  doc.setFont("helvetica", "bold");
+  doc.setTextColor(...DARK);
+  doc.text(title, 14, y);
+  // Underline
+  doc.setDrawColor(...TEAL);
+  doc.setLineWidth(0.8);
+  doc.line(14, y + 1.5, 14 + doc.getTextWidth(title), y + 1.5);
+  return y + 8;
+}
 
-// ─── DAILY REPORT WITH RECEIPT ───────────────────────────────────────────────
+const headStyle = { fillColor: TEAL, textColor: WHITE, fontStyle: "bold" as const, fontSize: 9 };
+const bodyStyle = { fontSize: 9, textColor: DARK, cellPadding: 3 };
+const altRowStyle = { fillColor: LIGHT_BG };
+
+// ─── DAILY REPORT (A4, Professional) ─────────────────────────────────────────
 
 export function generateDailyReport(
-  date: string, // "YYYY-MM-DD"
+  date: string,
   transactions: Transaction[],
   expenses: Expense[]
 ) {
@@ -64,133 +93,107 @@ export function generateDailyReport(
     year: "numeric",
   });
 
-  // Receipt-style: 80mm width ≈ 226 points
-  const receiptWidth = 80;
-  const doc = new jsPDF({ unit: "mm", format: [receiptWidth, 297] });
-  const pw = receiptWidth;
-  const margin = 6;
-  const contentWidth = pw - margin * 2;
+  const doc = new jsPDF();
+  const pw = doc.internal.pageSize.getWidth();
 
-  // Header
-  doc.setFillColor(...DARK_BG);
-  doc.rect(0, 0, pw, 22, "F");
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(14);
-  doc.text("GlamBook", pw / 2, 10, { align: "center" });
-  doc.setFontSize(7);
-  doc.text("Daily Sales Receipt", pw / 2, 15, { align: "center" });
-  doc.text(dateLabel, pw / 2, 19, { align: "center" });
+  drawBrandedHeader(doc, "Daily Sales Report", dateLabel);
 
-  let y = 27;
+  // Summary cards row
+  let y = 48;
+  y = sectionTitle(doc, "Summary", y);
 
-  // Dashed line
-  const drawDash = () => {
-    doc.setDrawColor(180, 180, 180);
-    doc.setLineDashPattern([1, 1], 0);
-    doc.line(margin, y, pw - margin, y);
-    y += 4;
-  };
-
-  drawDash();
-
-  // Summary
-  doc.setTextColor(60, 60, 60);
-  doc.setFontSize(8);
-  const summaryRows = [
-    ["Total Revenue", fmt(totalRevenue)],
-    ["Cash", fmt(cashRevenue)],
-    ["Online", fmt(onlineRevenue)],
-    ["Expenses", fmt(totalExpenses)],
-    ["Net Profit", fmt(profit)],
-    ["Transactions", String(dayTx.length)],
-  ];
-
-  summaryRows.forEach(([label, value]) => {
-    doc.setFont("helvetica", label === "Net Profit" ? "bold" : "normal");
-    doc.text(label, margin, y);
-    doc.text(value, pw - margin, y, { align: "right" });
-    y += 5;
+  autoTable(doc, {
+    startY: y,
+    head: [["Metric", "Value"]],
+    body: [
+      ["Total Revenue", fmt(totalRevenue)],
+      ["Cash Revenue", fmt(cashRevenue)],
+      ["Online Revenue", fmt(onlineRevenue)],
+      ["Total Expenses", fmt(totalExpenses)],
+      ["Net Profit", fmt(profit)],
+      ["Total Transactions", String(dayTx.length)],
+    ],
+    theme: "striped",
+    headStyles: headStyle,
+    bodyStyles: bodyStyle,
+    alternateRowStyles: altRowStyle,
+    columnStyles: { 1: { halign: "right", fontStyle: "bold" } },
+    margin: { left: 14, right: pw / 2 + 5 },
+    tableWidth: pw / 2 - 19,
   });
 
-  y += 1;
-  drawDash();
+  const summaryEndY = (doc as any).lastAutoTable.finalY;
 
-  // Staff breakdown
+  // Staff performance (right side)
   if (staffStats.length > 0) {
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.text("Staff Breakdown", margin, y);
-    y += 5;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(8);
-    staffStats.forEach((s) => {
-      const count = dayTx.filter((t) => t.staffMember === s.name).length;
-      doc.text(s.name, margin, y);
-      doc.text(`${fmt(s.revenue)} (${count})`, pw - margin, y, { align: "right" });
-      y += 5;
+    autoTable(doc, {
+      startY: y,
+      head: [["Staff", "Revenue", "Txns"]],
+      body: staffStats.map((s) => [
+        s.name,
+        fmt(s.revenue),
+        String(dayTx.filter((t) => t.staffMember === s.name).length),
+      ]),
+      theme: "striped",
+      headStyles: headStyle,
+      bodyStyles: bodyStyle,
+      alternateRowStyles: altRowStyle,
+      columnStyles: { 1: { halign: "right" }, 2: { halign: "center" } },
+      margin: { left: pw / 2 + 5, right: 14 },
+      tableWidth: pw / 2 - 19,
     });
-    y += 1;
-    drawDash();
   }
 
-  // Transaction list
-  if (dayTx.length > 0) {
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.text("Transactions", margin, y);
-    y += 5;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
+  y = Math.max(summaryEndY, (doc as any).lastAutoTable?.finalY ?? summaryEndY) + 12;
 
-    dayTx.forEach((t, i) => {
-      if (y > 270) {
-        doc.addPage();
-        y = 10;
-      }
-      doc.setFont("helvetica", "bold");
-      doc.text(`#${i + 1}`, margin, y);
-      doc.setFont("helvetica", "normal");
-      doc.text(t.time, margin + 8, y);
-      doc.text(t.staffMember, margin + 22, y);
-      doc.text(t.paymentMethod === "cash" ? "Cash" : "Online", margin + 42, y);
-      doc.text(fmt(t.amount), pw - margin, y, { align: "right" });
-      y += 4.5;
+  // Transaction details
+  if (dayTx.length > 0) {
+    if (y > 230) { doc.addPage(); y = 20; }
+    y = sectionTitle(doc, "Transaction Details", y);
+
+    autoTable(doc, {
+      startY: y,
+      head: [["#", "Time", "Staff", "Method", "Amount"]],
+      body: dayTx.map((t, i) => [
+        String(i + 1),
+        t.time,
+        t.staffMember,
+        t.paymentMethod === "cash" ? "Cash" : "Online",
+        fmt(t.amount),
+      ]),
+      theme: "striped",
+      headStyles: headStyle,
+      bodyStyles: bodyStyle,
+      alternateRowStyles: altRowStyle,
+      columnStyles: {
+        0: { halign: "center", cellWidth: 12 },
+        4: { halign: "right", fontStyle: "bold" },
+      },
+      margin: { left: 14, right: 14 },
     });
 
-    y += 1;
-    drawDash();
+    y = (doc as any).lastAutoTable.finalY + 12;
   }
 
   // Expenses
   if (dayExp.length > 0) {
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.text("Expenses", margin, y);
-    y += 5;
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(7);
+    if (y > 230) { doc.addPage(); y = 20; }
+    y = sectionTitle(doc, "Expenses", y);
 
-    dayExp.forEach((e) => {
-      if (y > 270) {
-        doc.addPage();
-        y = 10;
-      }
-      doc.text(e.category, margin, y);
-      doc.text(e.description || "—", margin + 22, y);
-      doc.text(fmt(e.amount), pw - margin, y, { align: "right" });
-      y += 4.5;
+    autoTable(doc, {
+      startY: y,
+      head: [["Category", "Description", "Amount"]],
+      body: dayExp.map((e) => [e.category, e.description || "-", fmt(e.amount)]),
+      theme: "striped",
+      headStyles: headStyle,
+      bodyStyles: bodyStyle,
+      alternateRowStyles: altRowStyle,
+      columnStyles: { 2: { halign: "right", fontStyle: "bold" } },
+      margin: { left: 14, right: 14 },
     });
-
-    y += 1;
-    drawDash();
   }
 
-  // Footer
-  doc.setFontSize(7);
-  doc.setTextColor(140, 140, 140);
-  doc.text("Thank you — GlamBook", pw / 2, y + 2, { align: "center" });
-  doc.text(`Generated: ${new Date().toLocaleString("en-IN")}`, pw / 2, y + 6, { align: "center" });
-
+  drawFooter(doc);
   doc.save(`GlamBook_Daily_${date}.pdf`);
 }
 
@@ -209,24 +212,17 @@ export function generateMonthlyReport(
   const profit = totalRevenue - totalExpenses;
   const cashRevenue = monthTx.filter((t) => t.paymentMethod === "cash").reduce((s, t) => s + t.amount, 0);
   const onlineRevenue = totalRevenue - cashRevenue;
-
   const staffStats = getStaffStats(monthTx);
   const expenseBreakdown = getExpensesByCategory(monthExp);
 
-  const label = new Date(month + "-01").toLocaleDateString("en-IN", {
-    month: "long",
-    year: "numeric",
-  });
-
+  const label = new Date(month + "-01").toLocaleDateString("en-IN", { month: "long", year: "numeric" });
   const doc = new jsPDF();
+  const pw = doc.internal.pageSize.getWidth();
 
-  addHeader(doc, `Monthly Report — ${label}`, `Generated: ${new Date().toLocaleDateString("en-IN")}`);
+  drawBrandedHeader(doc, "Monthly Report", label);
 
-  let y = 52;
-  doc.setTextColor(60, 60, 60);
-  doc.setFontSize(14);
-  doc.text("Summary", 14, y);
-  y += 8;
+  let y = 48;
+  y = sectionTitle(doc, "Financial Summary", y);
 
   autoTable(doc, {
     startY: y,
@@ -237,21 +233,21 @@ export function generateMonthlyReport(
       ["Online Revenue", fmt(onlineRevenue)],
       ["Total Expenses", fmt(totalExpenses)],
       ["Net Profit", fmt(profit)],
-      ["Transactions", String(monthTx.length)],
+      ["Total Transactions", String(monthTx.length)],
     ],
-    theme: "grid",
-    headStyles: { fillColor: tableHead, textColor: 255 },
-    styles: { fontSize: 10 },
+    theme: "striped",
+    headStyles: headStyle,
+    bodyStyles: bodyStyle,
+    alternateRowStyles: altRowStyle,
+    columnStyles: { 1: { halign: "right", fontStyle: "bold" } },
     margin: { left: 14, right: 14 },
   });
 
-  y = (doc as any).lastAutoTable.finalY + 14;
-  doc.setFontSize(14);
-  doc.setTextColor(60, 60, 60);
-  doc.text("Staff Performance", 14, y);
-  y += 6;
+  y = (doc as any).lastAutoTable.finalY + 12;
 
+  // Staff + Expenses side by side
   if (staffStats.length > 0) {
+    y = sectionTitle(doc, "Staff Performance", y);
     autoTable(doc, {
       startY: y,
       head: [["Staff Member", "Revenue", "Transactions"]],
@@ -260,62 +256,64 @@ export function generateMonthlyReport(
         fmt(s.revenue),
         String(monthTx.filter((t) => t.staffMember === s.name).length),
       ]),
-      theme: "grid",
-      headStyles: { fillColor: tableHead, textColor: 255 },
-      styles: { fontSize: 10 },
+      theme: "striped",
+      headStyles: headStyle,
+      bodyStyles: bodyStyle,
+      alternateRowStyles: altRowStyle,
+      columnStyles: { 1: { halign: "right" }, 2: { halign: "center" } },
       margin: { left: 14, right: 14 },
     });
-    y = (doc as any).lastAutoTable.finalY + 14;
-  } else {
-    y += 6;
-    doc.setFontSize(10);
-    doc.text("No staff data for this period.", 14, y);
-    y += 14;
+    y = (doc as any).lastAutoTable.finalY + 12;
   }
 
-  if (y > 240) { doc.addPage(); y = 20; }
-  doc.setFontSize(14);
-  doc.setTextColor(60, 60, 60);
-  doc.text("Expense Breakdown", 14, y);
-  y += 6;
-
   if (expenseBreakdown.length > 0) {
+    if (y > 230) { doc.addPage(); y = 20; }
+    y = sectionTitle(doc, "Expense Breakdown", y);
     autoTable(doc, {
       startY: y,
       head: [["Category", "Amount"]],
-      body: expenseBreakdown.map((e) => [e.category, fmt(e.amount)]),
-      theme: "grid",
-      headStyles: { fillColor: tableHead, textColor: 255 },
-      styles: { fontSize: 10 },
+      body: [
+        ...expenseBreakdown.map((e) => [e.category, fmt(e.amount)]),
+        [{ content: "TOTAL", styles: { fontStyle: "bold" } }, { content: fmt(totalExpenses), styles: { fontStyle: "bold", halign: "right" as const } }],
+      ],
+      theme: "striped",
+      headStyles: headStyle,
+      bodyStyles: bodyStyle,
+      alternateRowStyles: altRowStyle,
+      columnStyles: { 1: { halign: "right" } },
       margin: { left: 14, right: 14 },
     });
-    y = (doc as any).lastAutoTable.finalY + 14;
-  } else {
-    y += 6;
-    doc.setFontSize(10);
-    doc.text("No expenses for this period.", 14, y);
-    y += 14;
+    y = (doc as any).lastAutoTable.finalY + 12;
   }
 
+  // Transaction details
   if (monthTx.length > 0) {
-    if (y > 220) { doc.addPage(); y = 20; }
-    doc.setFontSize(14);
-    doc.setTextColor(60, 60, 60);
-    doc.text("Transaction Details", 14, y);
-    y += 6;
-
+    if (y > 200) { doc.addPage(); y = 20; }
+    y = sectionTitle(doc, "All Transactions", y);
     autoTable(doc, {
       startY: y,
-      head: [["Date", "Time", "Staff", "Amount", "Method"]],
-      body: monthTx.map((t) => [t.date, t.time, t.staffMember, fmt(t.amount), t.paymentMethod]),
-      theme: "grid",
-      headStyles: { fillColor: tableHead, textColor: 255 },
-      styles: { fontSize: 8 },
+      head: [["#", "Date", "Time", "Staff", "Method", "Amount"]],
+      body: monthTx.map((t, i) => [
+        String(i + 1),
+        t.date,
+        t.time,
+        t.staffMember,
+        t.paymentMethod === "cash" ? "Cash" : "Online",
+        fmt(t.amount),
+      ]),
+      theme: "striped",
+      headStyles: headStyle,
+      bodyStyles: { ...bodyStyle, fontSize: 8 },
+      alternateRowStyles: altRowStyle,
+      columnStyles: {
+        0: { halign: "center", cellWidth: 10 },
+        5: { halign: "right", fontStyle: "bold" },
+      },
       margin: { left: 14, right: 14 },
     });
   }
 
-  addFooter(doc);
+  drawFooter(doc);
   doc.save(`GlamBook_Report_${month}.pdf`);
 }
 
@@ -334,19 +332,15 @@ export function generateAnnualReport(
   const profit = totalRevenue - totalExpenses;
   const cashRevenue = yearTx.filter((t) => t.paymentMethod === "cash").reduce((s, t) => s + t.amount, 0);
   const onlineRevenue = totalRevenue - cashRevenue;
-
   const staffStats = getStaffStats(yearTx);
   const expenseBreakdown = getExpensesByCategory(yearExp);
 
   const doc = new jsPDF();
 
-  addHeader(doc, `Annual Report — ${year}`, `Generated: ${new Date().toLocaleDateString("en-IN")}`);
+  drawBrandedHeader(doc, "Annual Report", `Financial Year ${year}`);
 
-  let y = 52;
-  doc.setTextColor(60, 60, 60);
-  doc.setFontSize(14);
-  doc.text("Annual Summary", 14, y);
-  y += 8;
+  let y = 48;
+  y = sectionTitle(doc, "Annual Summary", y);
 
   autoTable(doc, {
     startY: y,
@@ -359,19 +353,20 @@ export function generateAnnualReport(
       ["Net Profit", fmt(profit)],
       ["Total Transactions", String(yearTx.length)],
     ],
-    theme: "grid",
-    headStyles: { fillColor: tableHead, textColor: 255 },
-    styles: { fontSize: 10 },
+    theme: "striped",
+    headStyles: headStyle,
+    bodyStyles: bodyStyle,
+    alternateRowStyles: altRowStyle,
+    columnStyles: { 1: { halign: "right", fontStyle: "bold" } },
     margin: { left: 14, right: 14 },
   });
 
-  // Monthly breakdown
-  y = (doc as any).lastAutoTable.finalY + 14;
-  doc.setFontSize(14);
-  doc.text("Monthly Breakdown", 14, y);
-  y += 6;
+  y = (doc as any).lastAutoTable.finalY + 12;
 
-  const monthlyData: string[][] = [];
+  // Monthly breakdown
+  y = sectionTitle(doc, "Month-by-Month Breakdown", y);
+
+  const monthlyData: (string | { content: string; styles: Record<string, unknown> })[][] = [];
   for (let m = 1; m <= 12; m++) {
     const mm = String(m).padStart(2, "0");
     const prefix = `${year}-${mm}`;
@@ -380,7 +375,7 @@ export function generateAnnualReport(
     const rev = mTx.reduce((s, t) => s + t.amount, 0);
     const exp = mExp.reduce((s, e) => s + e.amount, 0);
     if (rev > 0 || exp > 0) {
-      const monthName = new Date(`${prefix}-01`).toLocaleDateString("en-IN", { month: "short" });
+      const monthName = new Date(`${prefix}-01`).toLocaleDateString("en-IN", { month: "long" });
       monthlyData.push([monthName, fmt(rev), fmt(exp), fmt(rev - exp), String(mTx.length)]);
     }
   }
@@ -390,26 +385,30 @@ export function generateAnnualReport(
       startY: y,
       head: [["Month", "Revenue", "Expenses", "Profit", "Txns"]],
       body: monthlyData,
-      theme: "grid",
-      headStyles: { fillColor: tableHead, textColor: 255 },
-      styles: { fontSize: 9 },
+      theme: "striped",
+      headStyles: headStyle,
+      bodyStyles: bodyStyle,
+      alternateRowStyles: altRowStyle,
+      columnStyles: {
+        1: { halign: "right" },
+        2: { halign: "right" },
+        3: { halign: "right", fontStyle: "bold" },
+        4: { halign: "center" },
+      },
       margin: { left: 14, right: 14 },
     });
-    y = (doc as any).lastAutoTable.finalY + 14;
+    y = (doc as any).lastAutoTable.finalY + 12;
   } else {
-    y += 6;
     doc.setFontSize(10);
-    doc.text("No monthly data available.", 14, y);
-    y += 14;
+    doc.setTextColor(...GRAY);
+    doc.text("No data available for this year.", 14, y + 4);
+    y += 16;
   }
 
-  // Staff Performance
-  if (y > 220) { doc.addPage(); y = 20; }
-  doc.setFontSize(14);
-  doc.text("Staff Performance", 14, y);
-  y += 6;
-
+  // Staff
   if (staffStats.length > 0) {
+    if (y > 210) { doc.addPage(); y = 20; }
+    y = sectionTitle(doc, "Staff Performance", y);
     autoTable(doc, {
       startY: y,
       head: [["Staff Member", "Revenue", "Transactions"]],
@@ -418,41 +417,36 @@ export function generateAnnualReport(
         fmt(s.revenue),
         String(yearTx.filter((t) => t.staffMember === s.name).length),
       ]),
-      theme: "grid",
-      headStyles: { fillColor: tableHead, textColor: 255 },
-      styles: { fontSize: 10 },
+      theme: "striped",
+      headStyles: headStyle,
+      bodyStyles: bodyStyle,
+      alternateRowStyles: altRowStyle,
+      columnStyles: { 1: { halign: "right" }, 2: { halign: "center" } },
       margin: { left: 14, right: 14 },
     });
-    y = (doc as any).lastAutoTable.finalY + 14;
-  } else {
-    y += 6;
-    doc.setFontSize(10);
-    doc.text("No staff data.", 14, y);
-    y += 14;
+    y = (doc as any).lastAutoTable.finalY + 12;
   }
 
-  // Expense Breakdown
-  if (y > 240) { doc.addPage(); y = 20; }
-  doc.setFontSize(14);
-  doc.text("Expense Breakdown", 14, y);
-  y += 6;
-
+  // Expenses
   if (expenseBreakdown.length > 0) {
+    if (y > 230) { doc.addPage(); y = 20; }
+    y = sectionTitle(doc, "Expense Breakdown", y);
     autoTable(doc, {
       startY: y,
       head: [["Category", "Amount"]],
-      body: expenseBreakdown.map((e) => [e.category, fmt(e.amount)]),
-      theme: "grid",
-      headStyles: { fillColor: tableHead, textColor: 255 },
-      styles: { fontSize: 10 },
+      body: [
+        ...expenseBreakdown.map((e) => [e.category, fmt(e.amount)]),
+        [{ content: "TOTAL", styles: { fontStyle: "bold" } }, { content: fmt(totalExpenses), styles: { fontStyle: "bold", halign: "right" as const } }],
+      ],
+      theme: "striped",
+      headStyles: headStyle,
+      bodyStyles: bodyStyle,
+      alternateRowStyles: altRowStyle,
+      columnStyles: { 1: { halign: "right" } },
       margin: { left: 14, right: 14 },
     });
-  } else {
-    y += 6;
-    doc.setFontSize(10);
-    doc.text("No expenses recorded.", 14, y);
   }
 
-  addFooter(doc);
+  drawFooter(doc);
   doc.save(`GlamBook_Annual_${year}.pdf`);
 }
