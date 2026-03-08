@@ -403,7 +403,7 @@ export default function Payments() {
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">{t.date} · {t.time}</TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8" onClick={() => { deleteTransaction(t.id); toast.info("Deleted"); }}>
+                        <Button variant="ghost" size="icon" className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity h-8 w-8" onClick={() => { deleteTransaction(t.id); toast.info("Deleted"); }}>
                           <Trash2 className="h-3.5 w-3.5 text-destructive" />
                         </Button>
                       </TableCell>
