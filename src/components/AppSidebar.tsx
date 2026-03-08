@@ -2,7 +2,7 @@ import {
   LayoutDashboard,
   CreditCard,
   Users,
-  Receipt,
+  
   Wallet,
   ScanLine,
   Scissors,
