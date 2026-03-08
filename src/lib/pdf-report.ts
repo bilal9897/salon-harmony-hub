@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Transaction, Expense, getStaffStats, getExpensesByCategory } from "./store";
+import { Transaction, Expense, getStaffStats, getExpensesByCategory, getSalonName } from "./store";
 
 // jsPDF default fonts don't support ₹, so use "Rs." in PDFs
 function fmt(n: number) {
@@ -17,19 +17,16 @@ const WHITE: [number, number, number] = [255, 255, 255];
 
 function drawBrandedHeader(doc: jsPDF, title: string, subtitle: string) {
   const pw = doc.internal.pageSize.getWidth();
-  // Teal header bar
+  const name = getSalonName();
   doc.setFillColor(...TEAL);
   doc.rect(0, 0, pw, 38, "F");
-  // Brand name
   doc.setTextColor(...WHITE);
   doc.setFontSize(24);
   doc.setFont("helvetica", "bold");
-  doc.text("Fresh Saloon", pw / 2, 16, { align: "center" });
-  // Title
+  doc.text(name, pw / 2, 16, { align: "center" });
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
   doc.text(title, pw / 2, 25, { align: "center" });
-  // Subtitle
   doc.setFontSize(8);
   doc.text(subtitle, pw / 2, 32, { align: "center" });
 }
@@ -44,11 +41,10 @@ function drawFooter(doc: jsPDF) {
     doc.setDrawColor(...TEAL);
     doc.setLineWidth(0.5);
     doc.line(14, ph - 14, pw - 14, ph - 14);
-    // Footer text
     doc.setFontSize(7);
     doc.setTextColor(...GRAY);
     doc.setFont("helvetica", "normal");
-    doc.text("Fresh Saloon", 14, ph - 9);
+    doc.text(getSalonName(), 14, ph - 9);
     doc.text(`Page ${i} of ${pages}`, pw - 14, ph - 9, { align: "right" });
   }
 }
@@ -194,7 +190,8 @@ export function generateDailyReport(
   }
 
   drawFooter(doc);
-  doc.save(`FreshSaloon_Daily_${date}.pdf`);
+  const safeName = getSalonName().replace(/\s+/g, '_');
+  doc.save(`${safeName}_Daily_${date}.pdf`);
 }
 
 // ─── MONTHLY REPORT ──────────────────────────────────────────────────────────
@@ -314,7 +311,8 @@ export function generateMonthlyReport(
   }
 
   drawFooter(doc);
-  doc.save(`FreshSaloon_Report_${month}.pdf`);
+  const safeName = getSalonName().replace(/\s+/g, '_');
+  doc.save(`${safeName}_Report_${month}.pdf`);
 }
 
 // ─── ANNUAL REPORT ───────────────────────────────────────────────────────────
@@ -448,5 +446,6 @@ export function generateAnnualReport(
   }
 
   drawFooter(doc);
-  doc.save(`FreshSaloon_Annual_${year}.pdf`);
+  const safeName = getSalonName().replace(/\s+/g, '_');
+  doc.save(`${safeName}_Annual_${year}.pdf`);
 }

@@ -49,7 +49,7 @@ export default function Payments() {
   const [payTime, setPayTime] = useState(new Date().toTimeString().slice(0, 5));
 
   // Report contacts
-  const { whatsapp, gmail } = useReportContacts();
+  const { whatsapp, gmail, salonName } = useReportContacts();
 
   // Expense state
   const { expenses, addExpense, deleteExpense } = useExpenses();
@@ -68,7 +68,7 @@ export default function Payments() {
 
   const buildReportText = () => {
     const dateLabel = new Date(today).toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
-    let text = `✂️ *Fresh Saloon — Daily Report*\n📅 ${dateLabel}\n\n`;
+    let text = `✂️ *${salonName} — Daily Report*\n📅 ${dateLabel}\n\n`;
     text += `💰 Revenue: ₹${totalRevenue.toLocaleString("en-IN")}\n`;
     text += `💵 Cash: ₹${cashRevenue.toLocaleString("en-IN")}\n`;
     text += `📱 Online: ₹${onlineRevenue.toLocaleString("en-IN")}\n`;
