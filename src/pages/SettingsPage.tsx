@@ -267,7 +267,7 @@ function BackupRestore() {
 }
 
 function ReportSharing() {
-  const { whatsapp, gmail, setWhatsapp, setGmail } = useReportContacts();
+  const { whatsapp, gmail, salonName, setWhatsapp, setGmail, setSalonName } = useReportContacts();
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="card-elevated">
@@ -277,10 +277,22 @@ function ReportSharing() {
         </div>
         <div>
           <h3 className="section-title">Report Sharing</h3>
-          <p className="text-xs text-muted-foreground">Set WhatsApp number & Gmail for sending reports</p>
+          <p className="text-xs text-muted-foreground">Salon name, WhatsApp & Gmail for reports</p>
         </div>
       </div>
       <div className="space-y-4">
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <Store className="h-3.5 w-3.5" /> Salon Name
+          </Label>
+          <Input
+            placeholder="e.g. Fresh Saloon"
+            value={salonName}
+            onChange={(e) => setSalonName(e.target.value)}
+            className="rounded-xl"
+          />
+          <p className="text-xs text-muted-foreground">Used in PDF reports & shared messages</p>
+        </div>
         <div className="space-y-1.5">
           <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
             <MessageCircle className="h-3.5 w-3.5" /> WhatsApp Number
