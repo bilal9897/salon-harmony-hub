@@ -8,10 +8,9 @@ interface StatCardProps {
   trend?: string;
   trendUp?: boolean;
   className?: string;
-  accentColor?: string;
 }
 
-export function StatCard({ title, value, icon: Icon, trend, trendUp, className = "", accentColor }: StatCardProps) {
+export function StatCard({ title, value, icon: Icon, trend, trendUp, className = "" }: StatCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -32,21 +31,9 @@ export function StatCard({ title, value, icon: Icon, trend, trendUp, className =
             </div>
           )}
         </div>
-        <div
-          className="rounded-xl p-2.5 transition-transform duration-200 group-hover:scale-110"
-          style={{ backgroundColor: accentColor ? `${accentColor}15` : undefined }}
-        >
-          <Icon
-            className="h-5 w-5"
-            style={{ color: accentColor || undefined }}
-          />
-          {!accentColor && <Icon className="h-5 w-5 text-primary hidden" />}
+        <div className="rounded-xl bg-primary/10 p-2.5 transition-transform duration-200 group-hover:scale-110">
+          <Icon className="h-5 w-5 text-primary" />
         </div>
-        {!accentColor && (
-          <div className="rounded-xl bg-primary/8 p-2.5 transition-transform duration-200 group-hover:scale-110 -ml-[calc(2.5rem+1.25rem)]">
-            <Icon className="h-5 w-5 text-primary" />
-          </div>
-        )}
       </div>
     </motion.div>
   );
