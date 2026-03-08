@@ -28,7 +28,15 @@ const STORAGE_KEYS = {
   transactions: 'salon_transactions',
   expenses: 'salon_expenses',
   dailyCash: 'salon_daily_cash',
+  staffMembers: 'salon_staff_members',
+  serviceTypes: 'salon_service_types',
 };
+
+const DEFAULT_STAFF = ['Priya', 'Anita', 'Ravi', 'Meena', 'Sanjay', 'Deepa'];
+const DEFAULT_SERVICES = [
+  'Haircut', 'Hair Color', 'Blowout', 'Styling', 'Manicure',
+  'Pedicure', 'Facial', 'Waxing', 'Massage', 'Bridal Package', 'Other'
+];
 
 function load<T>(key: string, fallback: T[]): T[] {
   try {
@@ -107,6 +115,73 @@ export function useDailyCash() {
   return { dailyCashEntries: entries, setDailyCash };
 }
 
+// Dynamic staff & services
+export function useStaffMembers() {
+  const [staff, setStaff] = useState<string[]>(() =>
+    load<string>(STORAGE_KEYS.staffMembers, DEFAULT_STAFF)
+  );
+
+  const addStaff = useCallback((name: string) => {
+    setStaff(prev => {
+      if (prev.includes(name)) return prev;
+      const next = [...prev, name];
+      save(STORAGE_KEYS.staffMembers, next);
+      return next;
+    });
+  }, []);
+
+  const removeStaff = useCallback((name: string) => {
+    setStaff(prev => {
+      const next = prev.filter(s => s !== name);
+      save(STORAGE_KEYS.staffMembers, next);
+      return next;
+    });
+  }, []);
+
+  const updateStaff = useCallback((oldName: string, newName: string) => {
+    setStaff(prev => {
+      const next = prev.map(s => s === oldName ? newName : s);
+      save(STORAGE_KEYS.staffMembers, next);
+      return next;
+    });
+  }, []);
+
+  return { staff, addStaff, removeStaff, updateStaff };
+}
+
+export function useServiceTypes() {
+  const [services, setServices] = useState<string[]>(() =>
+    load<string>(STORAGE_KEYS.serviceTypes, DEFAULT_SERVICES)
+  );
+
+  const addService = useCallback((name: string) => {
+    setServices(prev => {
+      if (prev.includes(name)) return prev;
+      const next = [...prev, name];
+      save(STORAGE_KEYS.serviceTypes, next);
+      return next;
+    });
+  }, []);
+
+  const removeService = useCallback((name: string) => {
+    setServices(prev => {
+      const next = prev.filter(s => s !== name);
+      save(STORAGE_KEYS.serviceTypes, next);
+      return next;
+    });
+  }, []);
+
+  const updateService = useCallback((oldName: string, newName: string) => {
+    setServices(prev => {
+      const next = prev.map(s => s === oldName ? newName : s);
+      save(STORAGE_KEYS.serviceTypes, next);
+      return next;
+    });
+  }, []);
+
+  return { services, addService, removeService, updateService };
+}
+
 // Analytics helpers
 export function getToday(): string {
   return new Date().toISOString().split('T')[0];
@@ -129,15 +204,6 @@ export function getExpensesByCategory(expenses: Expense[]) {
   });
   return Object.entries(map).map(([category, amount]) => ({ category, amount }));
 }
-
-export const SERVICE_TYPES = [
-  'Haircut', 'Hair Color', 'Blowout', 'Styling', 'Manicure',
-  'Pedicure', 'Facial', 'Waxing', 'Massage', 'Bridal Package', 'Other'
-];
-
-export const STAFF_MEMBERS = [
-  'Priya', 'Anita', 'Ravi', 'Meena', 'Sanjay', 'Deepa'
-];
 
 export const EXPENSE_CATEGORIES = [
   'Products', 'Utilities', 'Maintenance', 'Rent', 'Supplies', 'Marketing', 'Other'
