@@ -30,6 +30,8 @@ const STORAGE_KEYS = {
   dailyCash: 'salon_daily_cash',
   staffMembers: 'salon_staff_members',
   serviceTypes: 'salon_service_types',
+  whatsappNumber: 'salon_whatsapp_number',
+  gmailAddress: 'salon_gmail_address',
 };
 
 const DEFAULT_STAFF = ['Azam', 'Shahnawaz', 'Aalam'];
@@ -208,3 +210,27 @@ export function getExpensesByCategory(expenses: Expense[]) {
 export const EXPENSE_CATEGORIES = [
   'Chits', 'Food', 'Chai', 'Food & Chai', 'Rent', 'Other'
 ];
+
+const DEFAULT_WHATSAPP = '918197925360';
+const DEFAULT_GMAIL = 'freshsalon@gmail.com';
+
+export function useReportContacts() {
+  const [whatsapp, setWhatsappState] = useState(() =>
+    localStorage.getItem(STORAGE_KEYS.whatsappNumber) || DEFAULT_WHATSAPP
+  );
+  const [gmail, setGmailState] = useState(() =>
+    localStorage.getItem(STORAGE_KEYS.gmailAddress) || DEFAULT_GMAIL
+  );
+
+  const setWhatsapp = useCallback((val: string) => {
+    setWhatsappState(val);
+    localStorage.setItem(STORAGE_KEYS.whatsappNumber, val);
+  }, []);
+
+  const setGmail = useCallback((val: string) => {
+    setGmailState(val);
+    localStorage.setItem(STORAGE_KEYS.gmailAddress, val);
+  }, []);
+
+  return { whatsapp, gmail, setWhatsapp, setGmail };
+}

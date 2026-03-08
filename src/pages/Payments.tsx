@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useTransactions, useStaffMembers, useExpenses, EXPENSE_CATEGORIES, getToday } from "@/lib/store";
+import { useTransactions, useStaffMembers, useExpenses, useReportContacts, EXPENSE_CATEGORIES, getToday } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,6 +48,9 @@ export default function Payments() {
   const [payDate, setPayDate] = useState(getToday());
   const [payTime, setPayTime] = useState(new Date().toTimeString().slice(0, 5));
 
+  // Report contacts
+  const { whatsapp, gmail } = useReportContacts();
+
   // Expense state
   const { expenses, addExpense, deleteExpense } = useExpenses();
   const [expCategory, setExpCategory] = useState("");
@@ -94,13 +97,13 @@ export default function Payments() {
 
   const shareWhatsApp = () => {
     const text = buildReportText();
-    window.open(`https://wa.me/918197925360?text=${encodeURIComponent(text)}`, "_blank");
+    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   const shareGmail = () => {
     const text = buildReportText().replace(/\*/g, "");
     const subject = `Fresh Saloon — Daily Report ${today}`;
-    const mailtoLink = `mailto:freshsalon@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+    const mailtoLink = `mailto:${encodeURIComponent(gmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
     window.location.href = mailtoLink;
   };
 

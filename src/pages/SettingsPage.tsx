@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useStaffMembers } from "@/lib/store";
+import { useStaffMembers, useReportContacts } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Upload, Smartphone, HardDrive } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Upload, Smartphone, HardDrive, MessageCircle, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -265,6 +266,50 @@ function BackupRestore() {
   );
 }
 
+function ReportSharing() {
+  const { whatsapp, gmail, setWhatsapp, setGmail } = useReportContacts();
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="card-elevated">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+          <MessageCircle className="h-4.5 w-4.5 text-primary" />
+        </div>
+        <div>
+          <h3 className="section-title">Report Sharing</h3>
+          <p className="text-xs text-muted-foreground">Set WhatsApp number & Gmail for sending reports</p>
+        </div>
+      </div>
+      <div className="space-y-4">
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <MessageCircle className="h-3.5 w-3.5" /> WhatsApp Number
+          </Label>
+          <Input
+            placeholder="e.g. 918197925360"
+            value={whatsapp}
+            onChange={(e) => setWhatsapp(e.target.value.replace(/[^0-9]/g, ''))}
+            className="rounded-xl"
+          />
+          <p className="text-xs text-muted-foreground">Country code + number, no spaces or +</p>
+        </div>
+        <div className="space-y-1.5">
+          <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+            <Mail className="h-3.5 w-3.5" /> Gmail Address
+          </Label>
+          <Input
+            type="email"
+            placeholder="e.g. freshsalon@gmail.com"
+            value={gmail}
+            onChange={(e) => setGmail(e.target.value.trim())}
+            className="rounded-xl"
+          />
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function SettingsPage() {
   const { staff, addStaff, removeStaff, updateStaff } = useStaffMembers();
 
@@ -275,6 +320,7 @@ export default function SettingsPage() {
       <div className="max-w-lg space-y-6">
         <InstallPWA />
         <BackupRestore />
+        <ReportSharing />
 
         <EditableList
           title="Staff Members"
