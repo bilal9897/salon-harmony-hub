@@ -139,17 +139,35 @@ export default function Payments() {
         description="Record income and expenses in one place"
         icon={CreditCard}
         actions={
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2 rounded-xl"
-            onClick={() => {
-              generateDailyReport(getToday(), transactions, expenses);
-              toast.success("Daily report downloaded!");
-            }}
-          >
-            <FileDown className="h-4 w-4" /> Daily Report
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 rounded-xl"
+              onClick={shareWhatsApp}
+            >
+              <MessageCircle className="h-4 w-4" /> WhatsApp
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 rounded-xl"
+              onClick={shareGmail}
+            >
+              <Mail className="h-4 w-4" /> Gmail
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-1.5 rounded-xl"
+              onClick={() => {
+                generateDailyReport(getToday(), transactions, expenses);
+                toast.success("Daily report downloaded!");
+              }}
+            >
+              <FileDown className="h-4 w-4" /> PDF
+            </Button>
+          </div>
         }
       />
 
