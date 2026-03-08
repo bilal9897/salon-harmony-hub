@@ -232,7 +232,12 @@ export default function Payments() {
           className="form-section space-y-5"
         >
           <ChipSelect items={staff} value={staffMember} onChange={setStaffMember} label="Staff" />
-          <ChipSelect items={services} value={serviceType} onChange={setServiceType} label="Service" />
+          <ChipSelect items={services} value={serviceType} onChange={(v) => {
+            setServiceType(v);
+            if (v && servicePrices[v]) {
+              setPayAmount(String(servicePrices[v]));
+            }
+          }} label="Service" />
 
           <div className="space-y-2">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Amount (₹)</Label>
