@@ -103,7 +103,24 @@ export default function Payments() {
 
   return (
     <div>
-      <PageHeader title="Payments & Expenses" description="Record income and expenses in one place" icon={CreditCard} />
+      <PageHeader
+        title="Payments & Expenses"
+        description="Record income and expenses in one place"
+        icon={CreditCard}
+        actions={
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 rounded-xl"
+            onClick={() => {
+              generateDailyReport(getToday(), transactions, expenses);
+              toast.success("Daily report downloaded!");
+            }}
+          >
+            <FileDown className="h-4 w-4" /> Daily Report
+          </Button>
+        }
+      />
 
       {/* Tab Switcher */}
       <div className="flex gap-2 mb-5">
