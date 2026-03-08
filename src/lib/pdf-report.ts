@@ -41,11 +41,10 @@ function drawFooter(doc: jsPDF) {
     doc.setDrawColor(...TEAL);
     doc.setLineWidth(0.5);
     doc.line(14, ph - 14, pw - 14, ph - 14);
-    // Footer text
     doc.setFontSize(7);
     doc.setTextColor(...GRAY);
     doc.setFont("helvetica", "normal");
-    doc.text("Fresh Saloon", 14, ph - 9);
+    doc.text(getSalonName(), 14, ph - 9);
     doc.text(`Page ${i} of ${pages}`, pw - 14, ph - 9, { align: "right" });
   }
 }
