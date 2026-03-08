@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { Transaction, Expense, getStaffStats, getExpensesByCategory } from "./store";
+import { Transaction, Expense, getStaffStats, getExpensesByCategory, getSalonName } from "./store";
 
 // jsPDF default fonts don't support ₹, so use "Rs." in PDFs
 function fmt(n: number) {
