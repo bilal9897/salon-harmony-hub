@@ -72,6 +72,23 @@ export default function Payments() {
     text += `🔴 Expenses: ₹${totalExpenses.toLocaleString("en-IN")}\n`;
     text += `✅ Net Profit: ₹${(totalRevenue - totalExpenses).toLocaleString("en-IN")}\n`;
     text += `📊 Transactions: ${dayTx.length}\n`;
+
+    if (dayTx.length > 0) {
+      text += `\n📋 *Payments*\n`;
+      text += `━━━━━━━━━━━━━━━━━━━\n`;
+      dayTx.forEach((t, i) => {
+        text += `${i + 1}. ${t.staffMember} — ₹${t.amount.toLocaleString("en-IN")} (${t.paymentMethod === "cash" ? "💵" : "📱"})\n`;
+      });
+    }
+
+    if (dayExp.length > 0) {
+      text += `\n🔴 *Expenses*\n`;
+      text += `━━━━━━━━━━━━━━━━━━━\n`;
+      dayExp.forEach((e, i) => {
+        text += `${i + 1}. ${e.category}${e.description ? ` - ${e.description}` : ""} — ₹${e.amount.toLocaleString("en-IN")}\n`;
+      });
+    }
+
     return text;
   };
 
