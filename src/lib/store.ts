@@ -32,6 +32,7 @@ const STORAGE_KEYS = {
   serviceTypes: 'salon_service_types',
   whatsappNumber: 'salon_whatsapp_number',
   gmailAddress: 'salon_gmail_address',
+  salonName: 'salon_name',
 };
 
 const DEFAULT_STAFF = ['Azam', 'Shahnawaz', 'Aalam'];
