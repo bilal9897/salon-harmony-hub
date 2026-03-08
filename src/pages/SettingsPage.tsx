@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useStaffMembers, useReportContacts, useAmountPresets, useServiceTypes, getSalonName } from "@/lib/store";
+import { useStaffMembers, useReportContacts, useAmountPresets, useServiceTypes, useServicePrices, getSalonName } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -421,9 +421,137 @@ function DarkModeToggle() {
   );
 }
 
+function ServiceEditor() {
+  const { services, addService, removeService, updateService } = useServiceTypes();
+  const { prices, setPrice, removePrice } = useServicePrices();
+  const [newName, setNewName] = useState("");
+  const [newPrice, setNewPrice] = useState("");
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const [editPrice, setEditPrice] = useState("");
+
+  const handleAdd = () => {
+    const name = newName.trim();
+    if (!name) return;
+    if (services.includes(name)) { toast.error("Already exists!"); return; }
+    addService(name);
+    if (newPrice && Number(newPrice) > 0) setPrice(name, Number(newPrice));
+    setNewName("");
+    setNewPrice("");
+    toast.success(`Added "${name}"`);
+  };
+
+  const handleSaveEdit = (oldName: string) => {
+    const name = editName.trim();
+    if (!name) { setEditing(null); return; }
+    if (name !== oldName) {
+      if (services.includes(name)) { toast.error("Already exists!"); return; }
+      updateService(oldName, name);
+      removePrice(oldName);
+    }
+    if (editPrice && Number(editPrice) > 0) setPrice(name, Number(editPrice));
+    else removePrice(name);
+    setEditing(null);
+    toast.success("Updated!");
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="card-elevated">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+          <Scissors className="h-4.5 w-4.5 text-primary" />
+        </div>
+        <div>
+          <h3 className="section-title">Services</h3>
+          <p className="text-xs text-muted-foreground">{services.length} services · set default prices</p>
+        </div>
+      </div>
+
+      <div className="flex gap-2 mb-4">
+        <Input
+          placeholder="Service name"
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          className="rounded-xl flex-1"
+        />
+        <Input
+          type="number"
+          min="0"
+          placeholder="₹ Price"
+          value={newPrice}
+          onChange={(e) => setNewPrice(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          className="rounded-xl w-24"
+        />
+        <Button onClick={handleAdd} size="icon" className="rounded-xl shrink-0 h-10 w-10">
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="space-y-1">
+        {services.map((item) => (
+          <div key={item} className="group flex items-center gap-2 rounded-xl px-3 py-2.5 transition-colors hover:bg-muted/50">
+            {editing === item ? (
+              <>
+                <Input
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSaveEdit(item)}
+                  className="h-8 rounded-lg text-sm flex-1"
+                  autoFocus
+                />
+                <Input
+                  type="number"
+                  min="0"
+                  placeholder="₹"
+                  value={editPrice}
+                  onChange={(e) => setEditPrice(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleSaveEdit(item)}
+                  className="h-8 rounded-lg text-sm w-20"
+                />
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleSaveEdit(item)}>
+                  <Check className="h-3.5 w-3.5 text-success" />
+                </Button>
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setEditing(null)}>
+                  <X className="h-3.5 w-3.5 text-muted-foreground" />
+                </Button>
+              </>
+            ) : (
+              <>
+                <span className="flex-1 text-sm text-foreground">{item}</span>
+                {prices[item] ? (
+                  <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-lg">₹{prices[item]}</span>
+                ) : (
+                  <span className="text-xs text-muted-foreground">No price</span>
+                )}
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                  onClick={() => { setEditing(item); setEditName(item); setEditPrice(prices[item] ? String(prices[item]) : ""); }}
+                >
+                  <Pencil className="h-3 w-3 text-muted-foreground" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-7 w-7 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
+                  onClick={() => { removeService(item); removePrice(item); toast.info(`Removed "${item}"`); }}
+                >
+                  <Trash2 className="h-3 w-3 text-destructive" />
+                </Button>
+              </>
+            )}
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 export default function SettingsPage() {
   const { staff, addStaff, removeStaff, updateStaff } = useStaffMembers();
-  const { services, addService, removeService, updateService } = useServiceTypes();
 
   return (
     <div>
@@ -446,15 +574,7 @@ export default function SettingsPage() {
           placeholder="Add new staff member..."
         />
 
-        <EditableList
-          title="Services"
-          icon={Scissors}
-          items={services}
-          onAdd={addService}
-          onRemove={removeService}
-          onUpdate={updateService}
-          placeholder="Add new service..."
-        />
+        <ServiceEditor />
       </div>
     </div>
   );

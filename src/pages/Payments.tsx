@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useTransactions, useStaffMembers, useExpenses, useReportContacts, useAmountPresets, useServiceTypes, EXPENSE_CATEGORIES, getToday } from "@/lib/store";
+import { useTransactions, useStaffMembers, useExpenses, useReportContacts, useAmountPresets, useServiceTypes, useServicePrices, EXPENSE_CATEGORIES, getToday } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,6 +43,7 @@ export default function Payments() {
   const { transactions, addTransaction, deleteTransaction } = useTransactions();
   const { staff } = useStaffMembers();
   const { services } = useServiceTypes();
+  const { prices: servicePrices } = useServicePrices();
   const [staffMember, setStaffMember] = useState("");
   const [serviceType, setServiceType] = useState("");
   const [payAmount, setPayAmount] = useState("");
@@ -231,7 +232,12 @@ export default function Payments() {
           className="form-section space-y-5"
         >
           <ChipSelect items={staff} value={staffMember} onChange={setStaffMember} label="Staff" />
-          <ChipSelect items={services} value={serviceType} onChange={setServiceType} label="Service" />
+          <ChipSelect items={services} value={serviceType} onChange={(v) => {
+            setServiceType(v);
+            if (v && servicePrices[v]) {
+              setPayAmount(String(servicePrices[v]));
+            }
+          }} label="Service" />
 
           <div className="space-y-2">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Amount (₹)</Label>
