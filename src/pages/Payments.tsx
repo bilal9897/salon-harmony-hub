@@ -127,6 +127,7 @@ export default function Payments() {
     });
     toast.success("✅ Payment recorded!");
     setPayAmount("");
+    setServiceType("");
   };
 
   const handleExpenseSubmit = (e: React.FormEvent) => {
