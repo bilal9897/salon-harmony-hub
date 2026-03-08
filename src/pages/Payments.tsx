@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Trash2, Plus, CreditCard, IndianRupee, RotateCcw, Receipt } from "lucide-react";
+import { Trash2, Plus, CreditCard, IndianRupee, RotateCcw, Receipt, FileDown } from "lucide-react";
+import { generateDailyReport } from "@/lib/pdf-report";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -102,7 +103,24 @@ export default function Payments() {
 
   return (
     <div>
-      <PageHeader title="Payments & Expenses" description="Record income and expenses in one place" icon={CreditCard} />
+      <PageHeader
+        title="Payments & Expenses"
+        description="Record income and expenses in one place"
+        icon={CreditCard}
+        actions={
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2 rounded-xl"
+            onClick={() => {
+              generateDailyReport(getToday(), transactions, expenses);
+              toast.success("Daily report downloaded!");
+            }}
+          >
+            <FileDown className="h-4 w-4" /> Daily Report
+          </Button>
+        }
+      />
 
       {/* Tab Switcher */}
       <div className="flex gap-2 mb-5">
