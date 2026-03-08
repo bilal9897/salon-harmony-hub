@@ -65,11 +65,27 @@ export default function Expenses() {
               ))}
             </div>
           </div>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Amount (₹) *</Label>
-            <Input type="number" min="1" placeholder="1000" value={amount} onChange={e => setAmount(e.target.value)} className="rounded-xl" />
+            <div className="flex flex-wrap gap-2">
+              {[20, 30, 40, 60, 70, 100, 150, 200].map(preset => (
+                <button
+                  key={preset}
+                  type="button"
+                  onClick={() => setAmount(String(preset))}
+                  className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-150 border ${
+                    amount === String(preset)
+                      ? "bg-primary text-primary-foreground border-primary shadow-sm scale-[1.02]"
+                      : "bg-card text-foreground border-border hover:border-primary/40 hover:bg-accent/50"
+                  }`}
+                >
+                  ₹{preset}
+                </button>
+              ))}
+            </div>
+            <Input type="number" min="1" placeholder="Custom amount" value={amount} onChange={e => setAmount(e.target.value)} className="rounded-xl" />
           </div>
+        <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Description</Label>
             <Input placeholder="e.g. Shampoo purchase" value={description} onChange={e => setDescription(e.target.value)} className="rounded-xl" />
