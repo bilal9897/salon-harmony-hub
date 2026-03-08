@@ -311,7 +311,8 @@ export function generateMonthlyReport(
   }
 
   drawFooter(doc);
-  doc.save(`FreshSaloon_Report_${month}.pdf`);
+  const safeName = getSalonName().replace(/\s+/g, '_');
+  doc.save(`${safeName}_Report_${month}.pdf`);
 }
 
 // ─── ANNUAL REPORT ───────────────────────────────────────────────────────────
