@@ -448,5 +448,5 @@ export function generateAnnualReport(
   }
 
   drawFooter(doc);
-  doc.save(`GlamBook_Annual_${year}.pdf`);
+  doc.save(`FreshSaloon_Annual_${year}.pdf`);
 }
