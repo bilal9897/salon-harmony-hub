@@ -10,6 +10,7 @@ import Staff from "./pages/Staff";
 import Expenses from "./pages/Expenses";
 import DailyCash from "./pages/DailyCash";
 import Scanner from "./pages/Scanner";
+import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
