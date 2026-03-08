@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useStaffMembers, useReportContacts } from "@/lib/store";
+import { useStaffMembers, useReportContacts, useAmountPresets } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Upload, Smartphone, HardDrive, MessageCircle, Mail, Store } from "lucide-react";
+import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Upload, Smartphone, HardDrive, MessageCircle, Mail, Store, IndianRupee } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -322,6 +322,73 @@ function ReportSharing() {
   );
 }
 
+function PresetEditor({ title, presets, onChange, color }: { title: string; presets: number[]; onChange: (p: number[]) => void; color: "primary" | "destructive" }) {
+  const [newAmount, setNewAmount] = useState("");
+
+  const handleAdd = () => {
+    const num = Number(newAmount);
+    if (!num || num <= 0) return;
+    if (presets.includes(num)) { toast.error("Already exists!"); return; }
+    onChange([...presets, num]);
+    setNewAmount("");
+    toast.success(`Added ₹${num}`);
+  };
+
+  return (
+    <div className="space-y-3">
+      <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{title}</Label>
+      <div className="flex flex-wrap gap-2">
+        {presets.map(p => (
+          <div key={p} className={`flex items-center gap-1 rounded-xl px-3 py-1.5 text-sm font-semibold border ${
+            color === "primary" ? "bg-primary/10 text-primary border-primary/20" : "bg-destructive/10 text-destructive border-destructive/20"
+          }`}>
+            ₹{p.toLocaleString('en-IN')}
+            <button onClick={() => { onChange(presets.filter(x => x !== p)); toast.info(`Removed ₹${p}`); }} className="ml-1 hover:opacity-70">
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        ))}
+      </div>
+      <div className="flex gap-2">
+        <Input
+          type="number"
+          min="1"
+          placeholder="New amount"
+          value={newAmount}
+          onChange={(e) => setNewAmount(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          className="rounded-xl"
+        />
+        <Button onClick={handleAdd} size="icon" className="rounded-xl shrink-0 h-10 w-10">
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+function AmountPresets() {
+  const { paymentPresets, expensePresets, setPaymentPresets, setExpensePresets } = useAmountPresets();
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="card-elevated">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+          <IndianRupee className="h-4.5 w-4.5 text-primary" />
+        </div>
+        <div>
+          <h3 className="section-title">Quick Amount Buttons</h3>
+          <p className="text-xs text-muted-foreground">Customize preset amounts for payments & expenses</p>
+        </div>
+      </div>
+      <div className="space-y-5">
+        <PresetEditor title="Payment Presets" presets={paymentPresets} onChange={setPaymentPresets} color="primary" />
+        <PresetEditor title="Expense Presets" presets={expensePresets} onChange={setExpensePresets} color="destructive" />
+      </div>
+    </motion.div>
+  );
+}
+
 export default function SettingsPage() {
   const { staff, addStaff, removeStaff, updateStaff } = useStaffMembers();
 
@@ -333,6 +400,7 @@ export default function SettingsPage() {
         <InstallPWA />
         <BackupRestore />
         <ReportSharing />
+        <AmountPresets />
 
         <EditableList
           title="Staff Members"

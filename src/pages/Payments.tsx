@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useTransactions, useStaffMembers, useExpenses, useReportContacts, EXPENSE_CATEGORIES, getToday } from "@/lib/store";
+import { useTransactions, useStaffMembers, useExpenses, useReportContacts, useAmountPresets, EXPENSE_CATEGORIES, getToday } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,6 +50,7 @@ export default function Payments() {
 
   // Report contacts
   const { whatsapp, gmail, salonName } = useReportContacts();
+  const { paymentPresets, expensePresets } = useAmountPresets();
 
   // Expense state
   const { expenses, addExpense, deleteExpense } = useExpenses();
@@ -230,7 +231,7 @@ export default function Payments() {
           <div className="space-y-2">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Amount (₹)</Label>
             <div className="flex flex-wrap gap-2">
-              {[100, 200, 500, 1000, 1500, 2000].map(preset => (
+              {paymentPresets.map(preset => (
                 <button
                   key={preset}
                   type="button"
@@ -329,7 +330,7 @@ export default function Payments() {
           <div className="space-y-2">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Amount (₹) *</Label>
             <div className="flex flex-wrap gap-2">
-              {[30, 40, 100, 150, 200, 500].map(preset => (
+              {expensePresets.map(preset => (
                 <button
                   key={preset}
                   type="button"

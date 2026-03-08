@@ -33,7 +33,12 @@ const STORAGE_KEYS = {
   whatsappNumber: 'salon_whatsapp_number',
   gmailAddress: 'salon_gmail_address',
   salonName: 'salon_name',
+  paymentPresets: 'salon_payment_presets',
+  expensePresets: 'salon_expense_presets',
 };
+
+const DEFAULT_PAYMENT_PRESETS = [100, 200, 500, 1000, 1500, 2000];
+const DEFAULT_EXPENSE_PRESETS = [30, 40, 100, 150, 200, 500];
 
 const DEFAULT_STAFF = ['Azam', 'Shahnawaz', 'Aalam'];
 const DEFAULT_SERVICES = [
@@ -247,4 +252,27 @@ export function useReportContacts() {
   }, []);
 
   return { whatsapp, gmail, salonName, setWhatsapp, setGmail, setSalonName };
+}
+
+export function useAmountPresets() {
+  const [paymentPresets, setPaymentPresetsState] = useState<number[]>(() =>
+    load<number>(STORAGE_KEYS.paymentPresets, DEFAULT_PAYMENT_PRESETS)
+  );
+  const [expensePresets, setExpensePresetsState] = useState<number[]>(() =>
+    load<number>(STORAGE_KEYS.expensePresets, DEFAULT_EXPENSE_PRESETS)
+  );
+
+  const setPaymentPresets = useCallback((presets: number[]) => {
+    const sorted = [...presets].sort((a, b) => a - b);
+    setPaymentPresetsState(sorted);
+    save(STORAGE_KEYS.paymentPresets, sorted);
+  }, []);
+
+  const setExpensePresets = useCallback((presets: number[]) => {
+    const sorted = [...presets].sort((a, b) => a - b);
+    setExpensePresetsState(sorted);
+    save(STORAGE_KEYS.expensePresets, sorted);
+  }, []);
+
+  return { paymentPresets, expensePresets, setPaymentPresets, setExpensePresets };
 }
