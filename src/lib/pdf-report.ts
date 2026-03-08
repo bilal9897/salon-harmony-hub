@@ -24,7 +24,7 @@ function drawBrandedHeader(doc: jsPDF, title: string, subtitle: string) {
   doc.setTextColor(...WHITE);
   doc.setFontSize(24);
   doc.setFont("helvetica", "bold");
-  doc.text("GlamBook", pw / 2, 16, { align: "center" });
+  doc.text("Fresh Saloon", pw / 2, 16, { align: "center" });
   // Title
   doc.setFontSize(11);
   doc.setFont("helvetica", "normal");
