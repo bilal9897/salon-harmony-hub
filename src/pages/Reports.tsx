@@ -5,7 +5,7 @@ import { generateDailyReport, generateMonthlyReport, generateAnnualReport } from
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileDown, IndianRupee, TrendingDown, TrendingUp, Users, FileBarChart, Calendar, CalendarDays, CalendarRange, Receipt } from "lucide-react";
+import { FileDown, IndianRupee, TrendingDown, TrendingUp, Users, FileBarChart, Calendar, CalendarDays, CalendarRange, Receipt, MessageCircle } from "lucide-react";
 import { StatCard } from "@/components/StatCard";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
