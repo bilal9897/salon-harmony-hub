@@ -42,7 +42,9 @@ export default function Payments() {
   // Payment state
   const { transactions, addTransaction, deleteTransaction } = useTransactions();
   const { staff } = useStaffMembers();
+  const { services } = useServiceTypes();
   const [staffMember, setStaffMember] = useState("");
+  const [serviceType, setServiceType] = useState("");
   const [payAmount, setPayAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "online">("cash");
   const [payDate, setPayDate] = useState(getToday());
