@@ -314,7 +314,7 @@ export function generateMonthlyReport(
   }
 
   drawFooter(doc);
-  doc.save(`GlamBook_Report_${month}.pdf`);
+  doc.save(`FreshSaloon_Report_${month}.pdf`);
 }
 
 // ─── ANNUAL REPORT ───────────────────────────────────────────────────────────
