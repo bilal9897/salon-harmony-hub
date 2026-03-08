@@ -389,6 +389,38 @@ function AmountPresets() {
   );
 }
 
+function DarkModeToggle() {
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
+
+  const toggle = () => {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("salon_dark_mode", next ? "true" : "false");
+    toast.success(next ? "Dark mode enabled" : "Light mode enabled");
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="card-elevated">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+            {dark ? <Moon className="h-4.5 w-4.5 text-primary" /> : <Sun className="h-4.5 w-4.5 text-primary" />}
+          </div>
+          <div>
+            <h3 className="section-title">Appearance</h3>
+            <p className="text-xs text-muted-foreground">{dark ? "Dark mode" : "Light mode"}</p>
+          </div>
+        </div>
+        <Button variant="outline" onClick={toggle} className="rounded-xl gap-2">
+          {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {dark ? "Light" : "Dark"}
+        </Button>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function SettingsPage() {
   const { staff, addStaff, removeStaff, updateStaff } = useStaffMembers();
 
@@ -397,6 +429,7 @@ export default function SettingsPage() {
       <PageHeader title="Settings" description="Salon management" icon={SettingsIcon} />
 
       <div className="max-w-lg space-y-4 sm:space-y-6">
+        <DarkModeToggle />
         <InstallPWA />
         <BackupRestore />
         <ReportSharing />
