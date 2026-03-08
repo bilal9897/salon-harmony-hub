@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { useStaffMembers } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Smartphone } from "lucide-react";
+import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Upload, Smartphone, HardDrive } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -188,6 +188,83 @@ function InstallPWA() {
   );
 }
 
+function BackupRestore() {
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const BACKUP_KEYS = [
+    'salon_transactions',
+    'salon_expenses',
+    'salon_daily_cash',
+    'salon_staff_members',
+    'salon_service_types',
+  ];
+
+  const handleExport = () => {
+    const data: Record<string, unknown> = {};
+    BACKUP_KEYS.forEach(key => {
+      const raw = localStorage.getItem(key);
+      if (raw) data[key] = JSON.parse(raw);
+    });
+    data._exportedAt = new Date().toISOString();
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fresh-saloon-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Backup downloaded!");
+  };
+
+  const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      try {
+        const data = JSON.parse(ev.target?.result as string);
+        let restored = 0;
+        BACKUP_KEYS.forEach(key => {
+          if (data[key]) {
+            localStorage.setItem(key, JSON.stringify(data[key]));
+            restored++;
+          }
+        });
+        toast.success(`Restored ${restored} data sets! Reloading...`);
+        setTimeout(() => window.location.reload(), 1000);
+      } catch {
+        toast.error("Invalid backup file.");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="card-elevated">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/8">
+          <HardDrive className="h-4.5 w-4.5 text-primary" />
+        </div>
+        <div>
+          <h3 className="section-title">Backup & Restore</h3>
+          <p className="text-xs text-muted-foreground">Export or import your salon data as a JSON file</p>
+        </div>
+      </div>
+      <div className="flex gap-3">
+        <Button onClick={handleExport} className="flex-1 rounded-xl gap-2">
+          <Download className="h-4 w-4" /> Export Backup
+        </Button>
+        <Button variant="outline" onClick={() => fileInputRef.current?.click()} className="flex-1 rounded-xl gap-2">
+          <Upload className="h-4 w-4" /> Import Backup
+        </Button>
+        <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleImport} />
+      </div>
+    </motion.div>
+  );
+}
+
 export default function SettingsPage() {
   const { staff, addStaff, removeStaff, updateStaff } = useStaffMembers();
 
@@ -197,6 +274,7 @@ export default function SettingsPage() {
 
       <div className="max-w-lg space-y-6">
         <InstallPWA />
+        <BackupRestore />
 
         <EditableList
           title="Staff Members"

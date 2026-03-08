@@ -407,6 +407,15 @@ export default function Payments() {
                     </TableRow>
                   ))
                 )}
+                {transactions.length > 0 && (
+                  <TableRow className="bg-muted/30 font-semibold border-t-2 border-border">
+                    <TableCell>Total ({transactions.slice(0, 50).length})</TableCell>
+                    <TableCell className="font-bold text-primary">₹{transactions.slice(0, 50).reduce((s, t) => s + t.amount, 0).toLocaleString('en-IN')}</TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
+                )}
               </TableBody>
             </Table>
           ) : (
@@ -446,6 +455,15 @@ export default function Payments() {
                       </TableCell>
                     </TableRow>
                   ))
+                )}
+                {expenses.length > 0 && (
+                  <TableRow className="bg-muted/30 font-semibold border-t-2 border-border">
+                    <TableCell>Total ({expenses.slice(0, 50).length})</TableCell>
+                    <TableCell className="font-bold text-destructive">₹{expenses.slice(0, 50).reduce((s, e) => s + e.amount, 0).toLocaleString('en-IN')}</TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                    <TableCell></TableCell>
+                  </TableRow>
                 )}
               </TableBody>
             </Table>
