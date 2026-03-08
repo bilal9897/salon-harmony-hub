@@ -320,6 +320,7 @@ export default function SettingsPage() {
       <div className="max-w-lg space-y-6">
         <InstallPWA />
         <BackupRestore />
+        <ReportSharing />
 
         <EditableList
           title="Staff Members"
