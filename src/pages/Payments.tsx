@@ -118,7 +118,7 @@ export default function Payments() {
     }
     addTransaction({
       clientName: "Walk-in",
-      serviceType: "General",
+      serviceType: serviceType || "General",
       staffMember,
       amount: Number(payAmount),
       paymentMethod,
