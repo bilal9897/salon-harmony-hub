@@ -79,6 +79,7 @@ export default function Expenses() {
             <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="rounded-xl" />
           </div>
         </div>
+        </div>
         <div className="mt-4">
           <Button type="submit" className="gap-2 rounded-xl">
             <Plus className="h-4 w-4" /> Add Expense
