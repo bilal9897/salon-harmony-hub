@@ -2,7 +2,6 @@ import {
   LayoutDashboard,
   CreditCard,
   Users,
-  
   Wallet,
   ScanLine,
   Scissors,
@@ -10,7 +9,7 @@ import {
   Settings,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useLocation } from "react-router-dom";
+import { getSalonName } from "@/lib/store";
 import {
   Sidebar,
   SidebarContent,
@@ -39,6 +38,7 @@ const toolItems = [
 export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  const name = getSalonName();
 
   const renderItems = (items: typeof mainItems) =>
     items.map((item) => (
@@ -68,7 +68,7 @@ export function AppSidebar() {
               </div>
               {!collapsed && (
                 <span className="font-display text-base font-bold text-sidebar-accent-foreground tracking-tight">
-                  Fresh Saloon
+                  {name}
                 </span>
               )}
             </div>

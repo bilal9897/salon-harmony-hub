@@ -394,9 +394,9 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <PageHeader title="Settings" description="Personal salon management" icon={SettingsIcon} />
+      <PageHeader title="Settings" description="Salon management" icon={SettingsIcon} />
 
-      <div className="max-w-lg space-y-6">
+      <div className="max-w-lg space-y-4 sm:space-y-6">
         <InstallPWA />
         <BackupRestore />
         <ReportSharing />
