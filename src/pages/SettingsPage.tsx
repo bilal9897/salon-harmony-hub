@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useStaffMembers, useReportContacts, useAmountPresets, getSalonName } from "@/lib/store";
+import { useStaffMembers, useReportContacts, useAmountPresets, useServiceTypes, getSalonName } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Upload, Smartphone, HardDrive, MessageCircle, Mail, Store, IndianRupee, Moon, Sun } from "lucide-react";
+import { Settings as SettingsIcon, Plus, Trash2, Pencil, Check, X, Users, Download, Upload, Smartphone, HardDrive, MessageCircle, Mail, Store, IndianRupee, Moon, Sun, Scissors } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -423,6 +423,7 @@ function DarkModeToggle() {
 
 export default function SettingsPage() {
   const { staff, addStaff, removeStaff, updateStaff } = useStaffMembers();
+  const { services, addService, removeService, updateService } = useServiceTypes();
 
   return (
     <div>
@@ -443,6 +444,16 @@ export default function SettingsPage() {
           onRemove={removeStaff}
           onUpdate={updateStaff}
           placeholder="Add new staff member..."
+        />
+
+        <EditableList
+          title="Services"
+          icon={Scissors}
+          items={services}
+          onAdd={addService}
+          onRemove={removeService}
+          onUpdate={updateService}
+          placeholder="Add new service..."
         />
       </div>
     </div>
