@@ -49,7 +49,7 @@ export default function Payments() {
   const [payTime, setPayTime] = useState(new Date().toTimeString().slice(0, 5));
 
   // Report contacts
-  const { whatsapp, gmail } = useReportContacts();
+  const { whatsapp, gmail, salonName } = useReportContacts();
 
   // Expense state
   const { expenses, addExpense, deleteExpense } = useExpenses();
