@@ -210,7 +210,7 @@ export default function Payments() {
           <div className="space-y-2">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Amount (₹)</Label>
             <div className="flex flex-wrap gap-2">
-              {[200, 500, 1000, 1500, 2000].map(preset => (
+              {[100, 200, 500, 1000, 1500, 2000].map(preset => (
                 <button
                   key={preset}
                   type="button"
@@ -309,7 +309,7 @@ export default function Payments() {
           <div className="space-y-2">
             <Label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Amount (₹) *</Label>
             <div className="flex flex-wrap gap-2">
-              {[20, 30, 40, 60, 70, 100, 150].map(preset => (
+              {[30, 40, 100, 150, 200, 500].map(preset => (
                 <button
                   key={preset}
                   type="button"
