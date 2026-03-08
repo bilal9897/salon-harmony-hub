@@ -381,6 +381,7 @@ export default function Payments() {
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
                   <TableHead className="text-xs uppercase tracking-wider">Staff</TableHead>
+                  <TableHead className="text-xs uppercase tracking-wider">Service</TableHead>
                   <TableHead className="text-xs uppercase tracking-wider">Amount</TableHead>
                   <TableHead className="text-xs uppercase tracking-wider">Method</TableHead>
                   <TableHead className="text-xs uppercase tracking-wider">Date & Time</TableHead>
