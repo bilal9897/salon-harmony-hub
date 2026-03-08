@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
-import { useTransactions, useStaffMembers, useExpenses, useReportContacts, useAmountPresets, EXPENSE_CATEGORIES, getToday } from "@/lib/store";
+import { useTransactions, useStaffMembers, useExpenses, useReportContacts, useAmountPresets, useServiceTypes, EXPENSE_CATEGORIES, getToday } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
