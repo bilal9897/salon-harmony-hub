@@ -97,7 +97,7 @@ export default function Payments() {
 
   const shareWhatsApp = () => {
     const text = buildReportText();
-    window.open(`https://wa.me/918197925360?text=${encodeURIComponent(text)}`, "_blank");
+    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(text)}`, "_blank");
   };
 
   const shareGmail = () => {
