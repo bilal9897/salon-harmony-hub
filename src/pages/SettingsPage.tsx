@@ -423,6 +423,7 @@ function DarkModeToggle() {
 
 export default function SettingsPage() {
   const { staff, addStaff, removeStaff, updateStaff } = useStaffMembers();
+  const { services, addService, removeService, updateService } = useServiceTypes();
 
   return (
     <div>
@@ -443,6 +444,16 @@ export default function SettingsPage() {
           onRemove={removeStaff}
           onUpdate={updateStaff}
           placeholder="Add new staff member..."
+        />
+
+        <EditableList
+          title="Services"
+          icon={Scissors}
+          items={services}
+          onAdd={addService}
+          onRemove={removeService}
+          onUpdate={updateService}
+          placeholder="Add new service..."
         />
       </div>
     </div>
