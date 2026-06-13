@@ -36,7 +36,47 @@ const STORAGE_KEYS = {
   paymentPresets: 'salon_payment_presets',
   expensePresets: 'salon_expense_presets',
   servicePrices: 'salon_service_prices',
+  menuItems: 'cafe_menu_items',
+  tables: 'cafe_tables',
+  openOrders: 'cafe_open_orders',
 };
+
+export interface MenuItem {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+}
+
+export interface OrderLine {
+  itemId: string;
+  name: string;
+  price: number;
+  qty: number;
+}
+
+export interface OpenOrder {
+  id: string;
+  tableName: string;
+  orderType: 'dine-in' | 'takeaway' | 'delivery';
+  lines: OrderLine[];
+  staffMember?: string;
+  createdAt: string;
+}
+
+const DEFAULT_MENU: MenuItem[] = [
+  { id: 'm1', name: 'Masala Chai', category: 'Beverages', price: 20 },
+  { id: 'm2', name: 'Filter Coffee', category: 'Beverages', price: 40 },
+  { id: 'm3', name: 'Cold Coffee', category: 'Beverages', price: 80 },
+  { id: 'm4', name: 'Veg Sandwich', category: 'Snacks', price: 60 },
+  { id: 'm5', name: 'Samosa', category: 'Snacks', price: 25 },
+  { id: 'm6', name: 'Maggi', category: 'Snacks', price: 50 },
+  { id: 'm7', name: 'Paneer Roll', category: 'Mains', price: 120 },
+  { id: 'm8', name: 'Veg Burger', category: 'Mains', price: 90 },
+  { id: 'm9', name: 'Chocolate Cake', category: 'Desserts', price: 70 },
+];
+
+const DEFAULT_TABLES = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6'];
 
 const DEFAULT_PAYMENT_PRESETS = [100, 200, 500, 1000, 1500, 2000];
 const DEFAULT_EXPENSE_PRESETS = [30, 40, 100, 150, 200, 500];
@@ -304,4 +344,91 @@ export function useAmountPresets() {
   }, []);
 
   return { paymentPresets, expensePresets, setPaymentPresets, setExpensePresets };
+}
+
+// ========== CAFE: Menu ==========
+export function useMenu() {
+  const [items, setItems] = useState<MenuItem[]>(() =>
+    load<MenuItem>(STORAGE_KEYS.menuItems, DEFAULT_MENU)
+  );
+
+  const addItem = useCallback((item: Omit<MenuItem, 'id'>) => {
+    setItems(prev => {
+      const next = [...prev, { ...item, id: crypto.randomUUID() }];
+      save(STORAGE_KEYS.menuItems, next);
+      return next;
+    });
+  }, []);
+
+  const updateItem = useCallback((id: string, patch: Partial<MenuItem>) => {
+    setItems(prev => {
+      const next = prev.map(i => i.id === id ? { ...i, ...patch } : i);
+      save(STORAGE_KEYS.menuItems, next);
+      return next;
+    });
+  }, []);
+
+  const removeItem = useCallback((id: string) => {
+    setItems(prev => {
+      const next = prev.filter(i => i.id !== id);
+      save(STORAGE_KEYS.menuItems, next);
+      return next;
+    });
+  }, []);
+
+  return { items, addItem, updateItem, removeItem };
+}
+
+// ========== CAFE: Tables ==========
+export function useTables() {
+  const [tables, setTablesState] = useState<string[]>(() =>
+    load<string>(STORAGE_KEYS.tables, DEFAULT_TABLES)
+  );
+
+  const addTable = useCallback((name: string) => {
+    setTablesState(prev => {
+      if (prev.includes(name)) return prev;
+      const next = [...prev, name];
+      save(STORAGE_KEYS.tables, next);
+      return next;
+    });
+  }, []);
+
+  const removeTable = useCallback((name: string) => {
+    setTablesState(prev => {
+      const next = prev.filter(t => t !== name);
+      save(STORAGE_KEYS.tables, next);
+      return next;
+    });
+  }, []);
+
+  return { tables, addTable, removeTable };
+}
+
+// ========== CAFE: Open Orders ==========
+export function useOpenOrders() {
+  const [orders, setOrders] = useState<OpenOrder[]>(() =>
+    load<OpenOrder>(STORAGE_KEYS.openOrders, [])
+  );
+
+  const upsertOrder = useCallback((order: OpenOrder) => {
+    setOrders(prev => {
+      const exists = prev.some(o => o.id === order.id);
+      const next = exists
+        ? prev.map(o => o.id === order.id ? order : o)
+        : [order, ...prev];
+      save(STORAGE_KEYS.openOrders, next);
+      return next;
+    });
+  }, []);
+
+  const closeOrder = useCallback((id: string) => {
+    setOrders(prev => {
+      const next = prev.filter(o => o.id !== id);
+      save(STORAGE_KEYS.openOrders, next);
+      return next;
+    });
+  }, []);
+
+  return { orders, upsertOrder, closeOrder };
 }
