@@ -7,6 +7,8 @@ import {
   Scissors,
   FileBarChart,
   Settings,
+  Coffee,
+  BookOpen,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { getSalonName } from "@/lib/store";
@@ -25,6 +27,8 @@ import {
 const mainItems = [
   { title: "Payments & Expenses", url: "/", icon: CreditCard },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Cafe (Tables)", url: "/cafe", icon: Coffee },
+  { title: "Menu", url: "/menu", icon: BookOpen },
   { title: "Staff", url: "/staff", icon: Users },
   { title: "Daily Cash", url: "/daily-cash", icon: Wallet },
   { title: "Reports", url: "/reports", icon: FileBarChart },
