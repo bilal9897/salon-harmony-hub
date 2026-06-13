@@ -2,10 +2,11 @@ import { useState, useMemo } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { useTransactions, useExpenses, getToday, getStaffStats, getExpensesByCategory } from "@/lib/store";
 import { generateDailyReport, generateMonthlyReport, generateAnnualReport } from "@/lib/pdf-report";
+import { generateDailyExcel, generateMonthlyExcel, generateAnnualExcel } from "@/lib/excel-report";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileDown, IndianRupee, TrendingDown, TrendingUp, Users, FileBarChart, Calendar, CalendarDays, CalendarRange, Receipt, MessageCircle } from "lucide-react";
+import { FileDown, IndianRupee, TrendingDown, TrendingUp, Users, FileBarChart, Calendar, CalendarDays, CalendarRange, Receipt, MessageCircle, FileSpreadsheet } from "lucide-react";
 import { StatCard } from "@/components/StatCard";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
@@ -65,6 +66,19 @@ export default function Reports() {
     } else {
       generateAnnualReport(year, transactions, expenses);
       toast.success("Annual report downloaded!");
+    }
+  };
+
+  const handleExportExcel = () => {
+    if (reportType === "daily") {
+      generateDailyExcel(date, transactions, expenses);
+      toast.success("Daily Excel downloaded!");
+    } else if (reportType === "monthly") {
+      generateMonthlyExcel(month, transactions, expenses);
+      toast.success("Monthly Excel downloaded!");
+    } else {
+      generateAnnualExcel(year, transactions, expenses);
+      toast.success("Annual Excel downloaded!");
     }
   };
 
@@ -174,6 +188,10 @@ export default function Reports() {
             <Button onClick={handleExport} className="gap-2 rounded-xl h-11 px-5 flex-1">
               {reportType === "daily" ? <Receipt className="h-4 w-4" /> : <FileDown className="h-4 w-4" />}
               {reportType === "daily" ? "Receipt" : "PDF"}
+            </Button>
+            <Button onClick={handleExportExcel} variant="outline" className="gap-2 rounded-xl h-11 px-5 border-primary/30 text-primary hover:bg-primary/10">
+              <FileSpreadsheet className="h-4 w-4" />
+              Excel
             </Button>
             <Button onClick={handleWhatsAppShare} variant="outline" className="gap-2 rounded-xl h-11 px-5 text-success border-success/30 hover:bg-success/10">
               <MessageCircle className="h-4 w-4" />
